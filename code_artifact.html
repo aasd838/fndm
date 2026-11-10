@@ -1,0 +1,3147 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" class="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <title>خزينة الشركاء | نظام إدارة الحساب البنكي المشترك</title>
+  <meta name="theme-color" content="#0f766e">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  
+  <!-- Google Fonts: Tajawal & Cairo -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Tajawal', 'Cairo', 'sans-serif'],
+            display: ['Cairo', 'Tajawal', 'sans-serif']
+          },
+          colors: {
+            brand: {
+              50: '#f0fdfa',
+              100: '#ccfbf1',
+              500: '#14b8a6',
+              600: '#0d9488',
+              700: '#0f766e',
+              800: '#115e59',
+              900: '#134e4a',
+            }
+          }
+        }
+      }
+    };
+  </script>
+
+  <!-- FontAwesome Icons via CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <!-- Chart.js via CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  
+  <!-- SheetJS (xlsx) via CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+  <style>
+    body {
+      font-family: 'Tajawal', 'Cairo', sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+    h1, h2, h3, .font-heading {
+      font-family: 'Cairo', 'Tajawal', sans-serif;
+    }
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(156, 163, 175, 0.4);
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(107, 114, 128, 0.7);
+    }
+    .num-ltr {
+      direction: ltr;
+      unicode-bidi: embed;
+      display: inline-block;
+    }
+    @keyframes slideInUp {
+      from { transform: translateY(15px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    .animate-view {
+      animation: slideInUp 0.22s ease-out forwards;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 dark:bg-slate-950 dark:text-slate-100 min-h-screen flex flex-col md:flex-row transition-colors duration-200 pb-20 md:pb-0">
+
+  <!-- ================= SIDEBAR (Desktop) ================= -->
+  <aside class="hidden md:flex md:flex-col md:w-64 lg:w-72 bg-white dark:bg-slate-900 border-l border-slate-200 dark:border-slate-800 shrink-0 sticky top-0 h-screen z-30 shadow-sm">
+    <!-- App Brand -->
+    <div class="p-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-teal-600 to-emerald-600 flex items-center justify-center text-white shadow-md shadow-teal-600/20">
+          <i class="fa-solid fa-building-columns text-xl"></i>
+        </div>
+        <div>
+          <h1 class="font-bold text-lg leading-tight text-slate-900 dark:text-white">خزينة الشركاء</h1>
+          <span class="text-xs text-slate-500 dark:text-slate-400">إدارة الحساب البنكي المشترك</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Navigation Links -->
+    <nav class="p-4 space-y-2 flex-1 overflow-y-auto">
+      <button type="button" data-nav="entry" class="nav-btn w-full flex items-center gap-3.5 px-4 py-3.5 rounded-xl font-bold text-sm transition-all">
+        <i class="fa-solid fa-bolt text-base w-5 text-center"></i>
+        <span>الإدخال السريع</span>
+      </button>
+      <button type="button" data-nav="dashboard" class="nav-btn w-full flex items-center gap-3.5 px-4 py-3.5 rounded-xl font-bold text-sm transition-all">
+        <i class="fa-solid fa-chart-pie text-base w-5 text-center"></i>
+        <span>لوحة التحكم والتحليلات</span>
+      </button>
+      <button type="button" data-nav="ledger" class="nav-btn w-full flex items-center gap-3.5 px-4 py-3.5 rounded-xl font-bold text-sm transition-all">
+        <i class="fa-solid fa-list-check text-base w-5 text-center"></i>
+        <span>السجل الذكي والتقارير</span>
+      </button>
+      <button type="button" data-nav="settings" class="nav-btn w-full flex items-center gap-3.5 px-4 py-3.5 rounded-xl font-bold text-sm transition-all">
+        <i class="fa-solid fa-sliders text-base w-5 text-center"></i>
+        <span>التخصيص والنسخ الاحتياطي</span>
+      </button>
+    </nav>
+
+    <!-- Quick Bank Status & Theme Toggle in Sidebar Footer -->
+    <div class="p-4 border-t border-slate-100 dark:border-slate-800 space-y-3">
+      <div class="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200/70 dark:border-slate-700/60">
+        <div class="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 mb-1">
+          <span>الرصيد الدفتري الكلي</span>
+          <i class="fa-solid fa-shield-halved text-teal-600 dark:text-teal-400"></i>
+        </div>
+        <div id="sidebarTotalBalance" class="font-bold text-lg text-slate-900 dark:text-white num-ltr">0.00</div>
+        <div id="sidebarReconBadge" class="mt-1.5 text-[11px] font-medium flex items-center gap-1 text-slate-500 dark:text-slate-400">
+          <span>لم تتم المطابقة بعد</span>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-between gap-2">
+        <button type="button" id="themeToggleDesktop" class="flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold transition">
+          <i class="fa-solid fa-moon dark:hidden"></i>
+          <i class="fa-solid fa-sun hidden dark:inline text-amber-400"></i>
+          <span id="themeToggleDesktopText">الوضع الليلي</span>
+        </button>
+        <button type="button" id="quickDownloadAppBtn" title="تحميل نسخة HTML مستقلة" class="py-2.5 px-3 rounded-xl bg-teal-50 hover:bg-teal-100 dark:bg-teal-900/30 dark:hover:bg-teal-900/50 text-teal-700 dark:text-teal-300 text-xs font-bold transition">
+          <i class="fa-solid fa-download"></i>
+        </button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ================= MAIN CONTENT WRAPPER ================= -->
+  <div class="flex-1 flex flex-col min-w-0">
+
+    <!-- Mobile Top Header -->
+    <header class="md:hidden sticky top-0 z-30 bg-white/95 dark:bg-slate-900/95 backdrop-blur border-b border-slate-200 dark:border-slate-800 px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center gap-2.5">
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-teal-600 to-emerald-600 flex items-center justify-center text-white shadow-sm">
+          <i class="fa-solid fa-building-columns text-sm"></i>
+        </div>
+        <div>
+          <h1 class="font-bold text-sm text-slate-900 dark:text-white leading-tight">خزينة الشركاء</h1>
+          <p class="text-[11px] text-slate-500 dark:text-slate-400">حساب بنكي مشترك (4 أطراف)</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
+        <button type="button" id="quickWhatsAppHeaderBtn" title="نسخ ملخص واتساب" class="w-9 h-9 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center border border-emerald-200 dark:border-emerald-800/60">
+          <i class="fa-brands fa-whatsapp text-base"></i>
+        </button>
+        <button type="button" id="themeToggleMobile" aria-label="تبديل المظهر" class="w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 flex items-center justify-center">
+          <i class="fa-solid fa-moon dark:hidden text-sm"></i>
+          <i class="fa-solid fa-sun hidden dark:inline text-amber-400 text-sm"></i>
+        </button>
+      </div>
+    </header>
+
+    <!-- LIVE BALANCE STRIP (Always visible across top for quick visibility) -->
+    <section class="bg-white dark:bg-slate-900 border-b border-slate-200/80 dark:border-slate-800 px-4 lg:px-8 py-3.5 shadow-xs">
+      <div class="max-w-7xl mx-auto">
+        <!-- Total Bank Banner + Quick Actions -->
+        <div class="flex flex-wrap items-center justify-between gap-2 mb-3 pb-2.5 border-b border-slate-100 dark:border-slate-800/80">
+          <div class="flex items-center gap-2.5">
+            <span class="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-teal-50 dark:bg-teal-950 text-teal-600 dark:text-teal-400 text-xs">
+              <i class="fa-solid fa-vault"></i>
+            </span>
+            <div>
+              <span class="text-xs text-slate-500 dark:text-slate-400 block sm:inline sm:ml-2">إجمالي الرصيد الدفتري بالبنك:</span>
+              <span id="stripTotalBankBalance" class="font-extrabold text-base sm:text-lg text-slate-900 dark:text-white num-ltr">0.00</span>
+              <span id="stripCurrencyLabel" class="text-xs font-semibold text-slate-500 dark:text-slate-400 mr-1">ج.س</span>
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            <span id="stripReconIndicator" class="text-xs px-2.5 py-1 rounded-full font-semibold bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300">
+              الرصيد الفعلي غير محدد
+            </span>
+            <button type="button" id="stripSampleDataBtn" class="hidden text-xs px-2.5 py-1 rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300 border border-amber-200 dark:border-amber-800 font-semibold transition">
+              <i class="fa-solid fa-wand-magic-sparkles ml-1"></i>بيانات تجريبية
+            </button>
+          </div>
+        </div>
+
+        <!-- 4 Groups Live Balance Cards -->
+        <div id="liveBalanceStripGrid" class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3.5">
+          <!-- Populated dynamically by JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- MAIN VIEWS CONTAINER -->
+    <main class="flex-1 px-4 lg:px-8 py-5 max-w-7xl w-full mx-auto space-y-6">
+
+      <!-- ================================================================= -->
+      <!-- VIEW 1: QUICK ENTRY VIEW (شاشة الإدخال السريع)                     -->
+      <!-- ================================================================= -->
+      <section id="view-entry" class="app-view animate-view space-y-6">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+          
+          <!-- Quick Entry Form Card (7 cols on desktop) -->
+          <div class="lg:col-span-7 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+            <div class="p-4 sm:p-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+              <div class="flex items-center gap-2.5">
+                <span class="w-8 h-8 rounded-lg bg-teal-50 dark:bg-teal-950/80 text-teal-600 dark:text-teal-400 flex items-center justify-center">
+                  <i class="fa-solid fa-plus-minus"></i>
+                </span>
+                <div>
+                  <h2 id="entryFormTitle" class="font-bold text-base sm:text-lg text-slate-900 dark:text-white">تسجيل عملية سريعة</h2>
+                  <p class="text-xs text-slate-500 dark:text-slate-400">أدخل تفاصيل الحركة البنكية ليتم تحديث الأرصدة فوراً</p>
+                </div>
+              </div>
+              <button type="button" id="cancelEditBtn" class="hidden text-xs font-bold px-3 py-1.5 rounded-lg bg-rose-50 text-rose-600 dark:bg-rose-950/50 dark:text-rose-400 hover:bg-rose-100 transition">
+                <i class="fa-solid fa-xmark ml-1"></i>إلغاء التعديل
+              </button>
+            </div>
+
+            <form id="quickEntryForm" class="p-4 sm:p-6 space-y-5" novalidate>
+              <input type="hidden" id="editingTxId" value="">
+
+              <!-- 1. Transaction Type (نوع التسجيل) -->
+              <div>
+                <label class="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-2">1. نوع التسجيل</label>
+                <div class="grid grid-cols-3 gap-2.5">
+                  <button type="button" data-tx-type="out" class="tx-type-btn py-3.5 px-3 rounded-xl border-2 font-bold text-sm flex flex-col sm:flex-row items-center justify-center gap-1.5 transition-all">
+                    <i class="fa-solid fa-arrow-trend-down text-base"></i>
+                    <span>صرف / سحب</span>
+                  </button>
+                  <button type="button" data-tx-type="in" class="tx-type-btn py-3.5 px-3 rounded-xl border-2 font-bold text-sm flex flex-col sm:flex-row items-center justify-center gap-1.5 transition-all">
+                    <i class="fa-solid fa-arrow-trend-up text-base"></i>
+                    <span>وارد / إيداع</span>
+                  </button>
+                  <button type="button" data-tx-type="transfer" class="tx-type-btn py-3.5 px-3 rounded-xl border-2 font-bold text-sm flex flex-col sm:flex-row items-center justify-center gap-1.5 transition-all">
+                    <i class="fa-solid fa-right-left text-base"></i>
+                    <span>تحويل داخلي</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- 2A. Single Group Radio Cards (تبع منو - صاحب العملية) -->
+              <div id="singleGroupSelectorWrap">
+                <div class="flex items-center justify-between mb-2">
+                  <label class="text-xs font-bold text-slate-600 dark:text-slate-300">2. تبع منو؟ (اختر صاحب العملية)</label>
+                  <span class="text-[11px] text-slate-400">يظهر الرصيد المتاح قبل العملية</span>
+                </div>
+                <div id="entryGroupCardsGrid" class="grid grid-cols-2 gap-2.5">
+                  <!-- Populated dynamically by JS -->
+                </div>
+              </div>
+
+              <!-- 2B. Internal Transfer Group Selectors (من طرف -> إلى طرف) -->
+              <div id="transferGroupSelectorWrap" class="hidden p-4 rounded-xl bg-indigo-50/60 dark:bg-indigo-950/30 border border-indigo-200/70 dark:border-indigo-800/60 space-y-4">
+                <div class="flex items-center gap-2 text-xs font-bold text-indigo-700 dark:text-indigo-300">
+                  <i class="fa-solid fa-circle-info"></i>
+                  <span>تحويل رصيد داخلي بين طرفين دون تغيير إجمالي الحساب البنكي</span>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label for="transferFromGroup" class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">من طرف (المُحوِّل - يُخصم منه):</label>
+                    <select id="transferFromGroup" class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2.5 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500"></select>
+                  </div>
+                  <div>
+                    <label for="transferToGroup" class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">إلى طرف (المستفيد - يُضاف له):</label>
+                    <select id="transferToGroup" class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2.5 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500"></select>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 3. Category Chips (نوع العملية / التصنيف) -->
+              <div id="categorySelectorWrap">
+                <div class="flex items-center justify-between mb-2">
+                  <label class="text-xs font-bold text-slate-600 dark:text-slate-300">3. نوع العملية (التصنيف)</label>
+                  <button type="button" id="jumpToCategoriesBtn" class="text-[11px] font-semibold text-teal-600 dark:text-teal-400 hover:underline">
+                    + تخصيص التصنيفات
+                  </button>
+                </div>
+                <div id="entryCategoryChips" class="flex flex-wrap gap-2">
+                  <!-- Populated dynamically by JS -->
+                </div>
+              </div>
+
+              <!-- 4. Amount & Date Row -->
+              <div class="grid grid-cols-1 sm:grid-cols-12 gap-3.5">
+                <div class="sm:col-span-7">
+                  <label for="entryAmount" class="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-1.5">4. المبلغ</label>
+                  <div class="relative">
+                    <input type="text" id="entryAmount" inputmode="decimal" placeholder="0.00" autocomplete="off"
+                      class="w-full rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/80 px-4 py-3 text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white focus:outline-none focus:border-teal-600 dark:focus:border-teal-400 transition num-ltr text-left pl-14">
+                    <span id="entryCurrencySuffix" class="absolute left-3.5 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400 dark:text-slate-500">ج.س</span>
+                  </div>
+                </div>
+
+                <div class="sm:col-span-5">
+                  <label for="entryDate" class="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-1.5">التاريخ والوقت</label>
+                  <input type="datetime-local" id="entryDate"
+                    class="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/80 px-3 py-3 text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-100 focus:outline-none focus:border-teal-600">
+                </div>
+              </div>
+
+              <!-- Live Overdraft / Balance Impact Alert Box -->
+              <div id="overdraftAlertBox" class="hidden p-3.5 rounded-xl bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-800 text-rose-700 dark:text-rose-300 text-xs space-y-1">
+                <div class="font-bold flex items-center gap-1.5 text-sm">
+                  <i class="fa-solid fa-triangle-exclamation text-rose-600 dark:text-rose-400"></i>
+                  <span>تحذير: سحب على المكشوف (يتجاوز رصيد الطرف المتاح!)</span>
+                </div>
+                <p id="overdraftAlertDetails" class="leading-relaxed"></p>
+              </div>
+
+              <!-- Live Preview After Operation -->
+              <div id="afterBalancePreviewBox" class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/70 dark:border-slate-700/70 flex flex-wrap items-center justify-between gap-2 text-xs">
+                <span class="text-slate-500 dark:text-slate-400 font-medium">الرصيد المتوقع للطرف بعد العملية:</span>
+                <span id="afterBalancePreviewValue" class="font-bold text-sm text-slate-800 dark:text-slate-200 num-ltr">—</span>
+              </div>
+
+              <!-- 5. Bank Reference & Comment -->
+              <div class="grid grid-cols-1 sm:grid-cols-12 gap-3.5">
+                <div class="sm:col-span-5">
+                  <label for="entryRefNo" class="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-1.5">
+                    رقم الإشعار البنكي / المرجع <span class="text-[10px] font-normal text-slate-400">(اختياري)</span>
+                  </label>
+                  <div class="relative">
+                    <input type="text" id="entryRefNo" placeholder="مثال: TRX-984120" autocomplete="off"
+                      class="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/80 px-3.5 py-2.5 text-sm font-medium focus:outline-none focus:border-teal-600">
+                  </div>
+                </div>
+                <div class="sm:col-span-7">
+                  <label for="entryComment" class="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-1.5">التعليق / البيان التفصيلي</label>
+                  <input type="text" id="entryComment" placeholder="اكتب توضيحاً مختصراً للعملية..." autocomplete="off"
+                    class="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/80 px-3.5 py-2.5 text-sm font-medium focus:outline-none focus:border-teal-600">
+                </div>
+              </div>
+
+              <!-- Submit Button -->
+              <button type="submit" id="entrySubmitBtn" class="w-full py-3.5 px-5 rounded-xl bg-gradient-to-l from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white font-bold text-base shadow-md shadow-teal-600/20 flex items-center justify-center gap-2 transition active:scale-[0.99]">
+                <i class="fa-solid fa-check-circle"></i>
+                <span id="entrySubmitBtnText">حفظ العملية وتحديث الأرصدة</span>
+              </button>
+            </form>
+          </div>
+
+          <!-- Recent Transactions & Quick Reconciliation Side Column (5 cols on desktop) -->
+          <div class="lg:col-span-5 space-y-5">
+            
+            <!-- Mini Bank Reconciliation Card -->
+            <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-4 sm:p-5 shadow-sm">
+              <div class="flex items-center justify-between mb-3">
+                <div class="flex items-center gap-2">
+                  <i class="fa-solid fa-scale-balanced text-teal-600 dark:text-teal-400"></i>
+                  <h3 class="font-bold text-sm sm:text-base text-slate-900 dark:text-white">المطابقة الفورية مع تطبيق البنك</h3>
+                </div>
+                <span class="text-[11px] text-slate-400">تحقق سريع</span>
+              </div>
+              <div class="space-y-3">
+                <div>
+                  <label for="quickActualBankInput" class="block text-xs text-slate-500 dark:text-slate-400 mb-1">أدخل الرصيد الفعلي الظاهر في تطبيق البنك الآن:</label>
+                  <div class="relative">
+                    <input type="text" id="quickActualBankInput" inputmode="decimal" placeholder="أدخل رصيد التطبيق الفعلي..."
+                      class="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3.5 py-2 text-base font-bold num-ltr text-left focus:outline-none focus:border-teal-600">
+                  </div>
+                </div>
+                <div id="quickReconStatusBox" class="p-3 rounded-xl text-xs font-semibold flex items-center justify-between bg-slate-50 dark:bg-slate-800/70 text-slate-600 dark:text-slate-300 border border-slate-200/60 dark:border-slate-700">
+                  <span>أدخل رصيد تطبيق البنك للمقارنة الفورية</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Last 5 Operations Feed -->
+            <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-4 sm:p-5 shadow-sm">
+              <div class="flex items-center justify-between mb-3.5">
+                <div class="flex items-center gap-2">
+                  <i class="fa-solid fa-clock-rotate-left text-teal-600 dark:text-teal-400"></i>
+                  <h3 class="font-bold text-sm sm:text-base text-slate-900 dark:text-white">آخر الحركات المسجلة</h3>
+                </div>
+                <button type="button" data-nav="ledger" class="nav-btn text-xs font-bold text-teal-600 dark:text-teal-400 hover:underline">
+                  عرض السجل الكامل <i class="fa-solid fa-arrow-left mr-1"></i>
+                </button>
+              </div>
+              <div id="recentTransactionsList" class="space-y-2.5">
+                <!-- Populated dynamically by JS -->
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      <!-- ================================================================= -->
+      <!-- VIEW 2: DASHBOARD & ANALYTICS (لوحة التحكم والرسوم البيانية)        -->
+      <!-- ================================================================= -->
+      <section id="view-dashboard" class="app-view hidden animate-view space-y-6">
+        
+        <!-- 4 Major KPI Cards -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3.5">
+          <!-- KPI 1: Total Book Balance -->
+          <div class="bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs">
+            <div class="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 mb-2">
+              <span class="font-bold">إجمالي الرصيد الدفتري</span>
+              <span class="w-8 h-8 rounded-lg bg-teal-50 dark:bg-teal-950 text-teal-600 dark:text-teal-400 flex items-center justify-center">
+                <i class="fa-solid fa-building-columns"></i>
+              </span>
+            </div>
+            <div id="kpiBookBalance" class="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white num-ltr">0.00</div>
+            <p class="text-[11px] text-slate-400 mt-1">مجموع أرصدة الأطراف الأربعة</p>
+          </div>
+
+          <!-- KPI 2: Total Inflows -->
+          <div class="bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs">
+            <div class="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 mb-2">
+              <span class="font-bold">إجمالي الوارد (الإيداعات)</span>
+              <span class="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
+                <i class="fa-solid fa-arrow-trend-up"></i>
+              </span>
+            </div>
+            <div id="kpiTotalIn" class="text-xl sm:text-2xl font-extrabold text-emerald-600 dark:text-emerald-400 num-ltr">0.00</div>
+            <p id="kpiTotalInSub" class="text-[11px] text-slate-400 mt-1">شاملاً الأرصدة الافتتاحية</p>
+          </div>
+
+          <!-- KPI 3: Total Outflows -->
+          <div class="bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs">
+            <div class="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 mb-2">
+              <span class="font-bold">إجمالي الصرف (المسحوبات)</span>
+              <span class="w-8 h-8 rounded-lg bg-rose-50 dark:bg-rose-950 text-rose-600 dark:text-rose-400 flex items-center justify-center">
+                <i class="fa-solid fa-arrow-trend-down"></i>
+              </span>
+            </div>
+            <div id="kpiTotalOut" class="text-xl sm:text-2xl font-extrabold text-rose-600 dark:text-rose-400 num-ltr">0.00</div>
+            <p id="kpiTotalOutCount" class="text-[11px] text-slate-400 mt-1">0 عملية صرف مسجلة</p>
+          </div>
+
+          <!-- KPI 4: Bank Reconciliation Status -->
+          <div class="bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs">
+            <div class="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 mb-2">
+              <span class="font-bold">حالة المطابقة البنكية</span>
+              <span class="w-8 h-8 rounded-lg bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
+                <i class="fa-solid fa-scale-balanced"></i>
+              </span>
+            </div>
+            <div id="kpiReconTitle" class="text-sm sm:text-base font-extrabold text-slate-800 dark:text-slate-100">غير محدد</div>
+            <p id="kpiReconSub" class="text-[11px] text-slate-400 mt-1">أدخل رصيد التطبيق بالأسفل</p>
+          </div>
+        </div>
+
+        <!-- Bank Reconciliation Widget (أداة مطابقة تطبيق البنك الفورية) -->
+        <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 shadow-sm">
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div class="space-y-1">
+              <div class="flex items-center gap-2">
+                <span class="w-8 h-8 rounded-lg bg-teal-50 dark:bg-teal-950 text-teal-600 dark:text-teal-400 flex items-center justify-center">
+                  <i class="fa-solid fa-building-circle-check"></i>
+                </span>
+                <h2 class="font-bold text-base sm:text-lg text-slate-900 dark:text-white">أداة مطابقة رصيد تطبيق البنك الفورية</h2>
+              </div>
+              <p class="text-xs text-slate-500 dark:text-slate-400">
+                أدخل الرصيد الفعلي الظاهر حالياً في تطبيق البنك لحساب المعادلة: <code class="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-teal-700 dark:text-teal-300">الفرق = الرصيد الفعلي - الرصيد الدفتري</code>
+              </p>
+            </div>
+
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 md:w-auto w-full">
+              <div class="relative sm:w-64">
+                <input type="text" id="dashboardActualBankInput" inputmode="decimal" placeholder="الرصيد الفعلي في تطبيق البنك..."
+                  class="w-full rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-4 py-2.5 text-base font-extrabold num-ltr text-left focus:outline-none focus:border-teal-600">
+              </div>
+              <button type="button" id="clearActualBankBtn" class="px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition">
+                مسح القيمة
+              </button>
+            </div>
+          </div>
+
+          <div id="dashboardReconResultBanner" class="mt-4 p-4 rounded-xl border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-slate-50 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700">
+            <!-- Populated dynamically by JS -->
+          </div>
+        </div>
+
+        <!-- Detailed Table & Cards of the 4 Groups (جدول وبطاقات تفصيل الأطراف الأربعة) -->
+        <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+          <div class="p-5 border-b border-slate-100 dark:border-slate-800 flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <h2 class="font-bold text-base sm:text-lg text-slate-900 dark:text-white">تفصيل الموقف المالي للأطراف الأربعة</h2>
+              <p class="text-xs text-slate-500 dark:text-slate-400">يشمل الرصيد الافتتاحي، إجمالي الوارد والصرف، صافي التحويلات الداخلية، وحصة كل طرف من السيولة</p>
+            </div>
+            <button type="button" id="dashboardQuickWhatsAppBtn" class="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold flex items-center gap-1.5 shadow-xs transition">
+              <i class="fa-brands fa-whatsapp text-sm"></i>
+              <span>نسخ التقرير للواتساب</span>
+            </button>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="w-full text-right text-xs sm:text-sm">
+              <thead class="bg-slate-50 dark:bg-slate-800/80 text-slate-600 dark:text-slate-300 border-b border-slate-200 dark:border-slate-700">
+                <tr>
+                  <th class="py-3.5 px-4 font-bold">الطرف / المجموعة</th>
+                  <th class="py-3.5 px-4 font-bold">الرصيد الافتتاحي</th>
+                  <th class="py-3.5 px-4 font-bold text-emerald-700 dark:text-emerald-400">إجمالي الوارد</th>
+                  <th class="py-3.5 px-4 font-bold text-rose-700 dark:text-rose-400">إجمالي الصرف</th>
+                  <th class="py-3.5 px-4 font-bold text-indigo-700 dark:text-indigo-400">صافي التحويلات</th>
+                  <th class="py-3.5 px-4 font-bold">الرصيد الصافي الحالي</th>
+                  <th class="py-3.5 px-4 font-bold">الحصة من البنك</th>
+                  <th class="py-3.5 px-4 font-bold">حالة الرصيد</th>
+                </tr>
+              </thead>
+              <tbody id="dashboardGroupsTableBody" class="divide-y divide-slate-100 dark:divide-slate-800">
+                <!-- Populated by JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Interactive Charts Section (الرسوم البيانية التفاعلية Chart.js) -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          
+          <!-- Chart 1: Bar Chart comparing In, Out, Remaining for the 4 groups -->
+          <div class="lg:col-span-7 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 shadow-sm">
+            <div class="mb-4">
+              <h3 class="font-bold text-sm sm:text-base text-slate-900 dark:text-white">مقارنة الوارد والصرف والرصيد المتبقي للأطراف الأربعة</h3>
+              <p class="text-xs text-slate-500 dark:text-slate-400">الوارد يشمل الرصيد الافتتاحي + الإيداعات + التحويلات الواردة</p>
+            </div>
+            <div class="relative h-72 w-full">
+              <canvas id="groupsBarChart"></canvas>
+            </div>
+          </div>
+
+          <!-- Chart 2: Doughnut Chart showing Liquidity Share -->
+          <div class="lg:col-span-5 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 shadow-sm">
+            <div class="mb-4">
+              <h3 class="font-bold text-sm sm:text-base text-slate-900 dark:text-white">توزيع حصص السيولة الحالية في البنك</h3>
+              <p class="text-xs text-slate-500 dark:text-slate-400">نسبة كل طرف من الأرصدة الموجبة المتاحة</p>
+            </div>
+            <div class="relative h-72 w-full flex items-center justify-center">
+              <canvas id="liquidityDoughnutChart"></canvas>
+            </div>
+          </div>
+
+          <!-- Chart 3: Expenses by Category with Group Filter -->
+          <div class="lg:col-span-12 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 shadow-sm">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+              <div>
+                <h3 class="font-bold text-sm sm:text-base text-slate-900 dark:text-white">توزيع المصروفات حسب التصنيفات</h3>
+                <p class="text-xs text-slate-500 dark:text-slate-400">تحليل أوجه الصرف لمعرفة البنود الأكثر استهلاكاً للسيولة</p>
+              </div>
+              <div class="flex items-center gap-2">
+                <label for="categoryChartGroupFilter" class="text-xs font-bold text-slate-600 dark:text-slate-300">فلترة حسب الطرف:</label>
+                <select id="categoryChartGroupFilter" class="rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3 py-2 text-xs font-bold focus:outline-none focus:border-teal-600">
+                  <option value="all">جميع الأطراف الأربعة</option>
+                </select>
+              </div>
+            </div>
+            <div class="relative h-72 w-full">
+              <canvas id="expensesCategoryChart"></canvas>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ================================================================= -->
+      <!-- VIEW 3: SMART LEDGER & WHATSAPP REPORT (السجل الذكي والتقارير)     -->
+      <!-- ================================================================= -->
+      <section id="view-ledger" class="app-view hidden animate-view space-y-5">
+        
+        <!-- Header & WhatsApp Generator Button -->
+        <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-4 sm:p-5 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h2 class="font-bold text-base sm:text-lg text-slate-900 dark:text-white">سجل العمليات الذكي والتقارير الفورية</h2>
+            <p class="text-xs text-slate-500 dark:text-slate-400">فلترة متقدمة، بحث بالبيان أو رقم الإشعار، ومشاركة ملخص واتساب بضغطة واحدة</p>
+          </div>
+          <div class="flex flex-wrap items-center gap-2.5">
+            <button type="button" id="openWhatsAppModalBtn" class="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm flex items-center gap-2 shadow-sm transition">
+              <i class="fa-brands fa-whatsapp text-base"></i>
+              <span>نسخ ملخص واتساب</span>
+            </button>
+            <button type="button" id="ledgerExportExcelBtn" class="px-3.5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold text-xs sm:text-sm flex items-center gap-2 transition">
+              <i class="fa-solid fa-file-excel text-emerald-600 dark:text-emerald-400"></i>
+              <span>تصدير Excel</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Instant Filters Bar -->
+        <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-4 sm:p-5 shadow-sm space-y-4">
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3">
+            <!-- Filter: Group -->
+            <div>
+              <label for="filterGroup" class="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-1">الطرف / المجموعة</label>
+              <select id="filterGroup" class="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3 py-2 text-xs font-bold">
+                <option value="all">الكل (جميع الأطراف)</option>
+              </select>
+            </div>
+
+            <!-- Filter: Type -->
+            <div>
+              <label for="filterType" class="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-1">نوع التسجيل</label>
+              <select id="filterType" class="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3 py-2 text-xs font-bold">
+                <option value="all">الكل (وارد + صرف + تحويل)</option>
+                <option value="in">وارد / إيداع فقط</option>
+                <option value="out">صرف / سحب فقط</option>
+                <option value="transfer">تحويل داخلي فقط</option>
+              </select>
+            </div>
+
+            <!-- Filter: Category -->
+            <div>
+              <label for="filterCategory" class="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-1">التصنيف</label>
+              <select id="filterCategory" class="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3 py-2 text-xs font-bold">
+                <option value="all">كل التصنيفات</option>
+              </select>
+            </div>
+
+            <!-- Filter: Date From -->
+            <div>
+              <label for="filterDateFrom" class="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-1">من تاريخ</label>
+              <input type="date" id="filterDateFrom" class="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3 py-2 text-xs font-bold">
+            </div>
+
+            <!-- Filter: Date To -->
+            <div>
+              <label for="filterDateTo" class="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-1">إلى تاريخ</label>
+              <input type="date" id="filterDateTo" class="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3 py-2 text-xs font-bold">
+            </div>
+
+            <!-- Filter: Search Text -->
+            <div>
+              <label for="filterSearch" class="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-1">بحث بالتعليق أو رقم الإشعار</label>
+              <div class="relative">
+                <input type="text" id="filterSearch" placeholder="ابحث هنا..."
+                  class="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 pr-3 pl-8 py-2 text-xs font-bold focus:outline-none focus:border-teal-600">
+                <i class="fa-solid fa-magnifying-glass absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+              </div>
+            </div>
+          </div>
+
+          <!-- Filtered Summary Strip & Reset Filters -->
+          <div class="pt-3 border-t border-slate-100 dark:border-slate-800 flex flex-wrap items-center justify-between gap-3">
+            <div class="flex flex-wrap items-center gap-3 sm:gap-5 text-xs">
+              <div>
+                <span class="text-slate-500 dark:text-slate-400">عدد الحركات:</span>
+                <span id="filteredCountBadge" class="font-extrabold text-slate-900 dark:text-white mr-1">0</span>
+              </div>
+              <div>
+                <span class="text-slate-500 dark:text-slate-400">إجمالي الوارد (المفلتر):</span>
+                <span id="filteredTotalIn" class="font-extrabold text-emerald-600 dark:text-emerald-400 mr-1 num-ltr">0.00</span>
+              </div>
+              <div>
+                <span class="text-slate-500 dark:text-slate-400">إجمالي الصرف (المفلتر):</span>
+                <span id="filteredTotalOut" class="font-extrabold text-rose-600 dark:text-rose-400 mr-1 num-ltr">0.00</span>
+              </div>
+              <div>
+                <span class="text-slate-500 dark:text-slate-400">الصافي:</span>
+                <span id="filteredNetAmount" class="font-extrabold text-teal-600 dark:text-teal-400 mr-1 num-ltr">0.00</span>
+              </div>
+            </div>
+
+            <button type="button" id="resetFiltersBtn" class="text-xs font-bold text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white flex items-center gap-1">
+              <i class="fa-solid fa-rotate-right"></i>
+              <span>إعادة ضبط الفلاتر</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Transactions Table / List -->
+        <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-right text-xs sm:text-sm">
+              <thead class="bg-slate-50 dark:bg-slate-800/80 text-slate-600 dark:text-slate-300 border-b border-slate-200 dark:border-slate-700">
+                <tr>
+                  <th class="py-3.5 px-4 font-bold">التاريخ</th>
+                  <th class="py-3.5 px-4 font-bold">النوع</th>
+                  <th class="py-3.5 px-4 font-bold">الطرف / المجموعة</th>
+                  <th class="py-3.5 px-4 font-bold">التصنيف</th>
+                  <th class="py-3.5 px-4 font-bold">المبلغ</th>
+                  <th class="py-3.5 px-4 font-bold">رقم الإشعار</th>
+                  <th class="py-3.5 px-4 font-bold">البيان / التعليق</th>
+                  <th class="py-3.5 px-4 font-bold text-center">إجراءات</th>
+                </tr>
+              </thead>
+              <tbody id="ledgerTableBody" class="divide-y divide-slate-100 dark:divide-slate-800">
+                <!-- Populated dynamically by JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================================================================= -->
+      <!-- VIEW 4: SETTINGS & DATA MANAGEMENT (شاشة التخصيص والنسخ الاحتياطي)  -->
+      <!-- ================================================================= -->
+      <section id="view-settings" class="app-view hidden animate-view space-y-6">
+        
+        <!-- General Currency & Account Title Setting -->
+        <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 shadow-sm">
+          <div class="flex items-center gap-2.5 mb-4">
+            <span class="w-8 h-8 rounded-lg bg-teal-50 dark:bg-teal-950 text-teal-600 dark:text-teal-400 flex items-center justify-center">
+              <i class="fa-solid fa-sliders"></i>
+            </span>
+            <div>
+              <h2 class="font-bold text-base sm:text-lg text-slate-900 dark:text-white">إعدادات الحساب العامة وتخصيص الأطراف الأربعة</h2>
+              <p class="text-xs text-slate-500 dark:text-slate-400">جميع العمليات مرتبطة بمعرّف برمجي ثابت (<code class="num-ltr">g1, g2, g3, g4</code>) لضمان عدم ضياع أي سجل عند تغيير الأسماء</p>
+            </div>
+          </div>
+
+          <form id="groupsSettingsForm" class="space-y-5">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pb-4 border-b border-slate-100 dark:border-slate-800">
+              <div>
+                <label for="settingAccountName" class="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-1.5">اسم الحساب البنكي المشترك (يظهر في التقارير)</label>
+                <input type="text" id="settingAccountName" placeholder="مثال: حساب بنكك المشترك - الشركاء"
+                  class="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3.5 py-2.5 text-sm font-bold">
+              </div>
+              <div>
+                <label for="settingCurrency" class="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-1.5">رمز العملة</label>
+                <input type="text" id="settingCurrency" placeholder="ج.س / ر.س / $"
+                  class="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3.5 py-2.5 text-sm font-bold">
+              </div>
+            </div>
+
+            <!-- 4 Groups Customization Cards -->
+            <div id="settingsGroupsGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <!-- Populated by JS -->
+            </div>
+
+            <div class="flex justify-end">
+              <button type="submit" class="px-6 py-3 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-bold text-sm shadow-sm flex items-center gap-2 transition">
+                <i class="fa-solid fa-floppy-disk"></i>
+                <span>حفظ إعدادات الأطراف والعملة</span>
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Category Management (إدارة التصنيفات) -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Expense Categories -->
+          <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 shadow-sm space-y-4">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <i class="fa-solid fa-tags text-rose-500"></i>
+                <h3 class="font-bold text-sm sm:text-base text-slate-900 dark:text-white">تصنيفات الصرف / السحب</h3>
+              </div>
+            </div>
+            <div class="flex gap-2">
+              <input type="text" id="newOutCategoryInput" placeholder="أضف تصنيف صرف جديد..."
+                class="flex-1 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3.5 py-2 text-xs font-bold">
+              <button type="button" id="addOutCategoryBtn" class="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold transition">
+                + إضافة
+              </button>
+            </div>
+            <div id="outCategoriesManageList" class="flex flex-wrap gap-2">
+              <!-- Populated by JS -->
+            </div>
+          </div>
+
+          <!-- Income Categories -->
+          <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 shadow-sm space-y-4">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <i class="fa-solid fa-tags text-emerald-500"></i>
+                <h3 class="font-bold text-sm sm:text-base text-slate-900 dark:text-white">تصنيفات الوارد / الإيداع</h3>
+              </div>
+            </div>
+            <div class="flex gap-2">
+              <input type="text" id="newInCategoryInput" placeholder="أضف تصنيف وارد جديد..."
+                class="flex-1 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3.5 py-2 text-xs font-bold">
+              <button type="button" id="addInCategoryBtn" class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition">
+                + إضافة
+              </button>
+            </div>
+            <div id="inCategoriesManageList" class="flex flex-wrap gap-2">
+              <!-- Populated by JS -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Data Center & Manual Sync (مركز البيانات والمزامنة اليدوية) -->
+        <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 shadow-sm space-y-5">
+          <div class="flex items-center gap-2.5">
+            <span class="w-8 h-8 rounded-lg bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
+              <i class="fa-solid fa-database"></i>
+            </span>
+            <div>
+              <h2 class="font-bold text-base sm:text-lg text-slate-900 dark:text-white">مركز البيانات والنسخ الاحتياطي والمزامنة</h2>
+              <p class="text-xs text-slate-500 dark:text-slate-400">بياناتك محفوظة محلياً 100% في متصفحك لخصوصية تامة على GitHub Pages — يمكنك تصديرها أو نقلها بين أجهزتك</p>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
+            <!-- Export Excel (.xlsx) -->
+            <button type="button" id="exportExcelBtn" class="p-4 rounded-xl border border-emerald-200 dark:border-emerald-800/70 bg-emerald-50/50 hover:bg-emerald-100/70 dark:bg-emerald-950/30 dark:hover:bg-emerald-950/60 text-right transition flex items-start gap-3.5">
+              <div class="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0">
+                <i class="fa-solid fa-file-excel text-lg"></i>
+              </div>
+              <div>
+                <div class="font-bold text-sm text-slate-900 dark:text-white">تصدير إلى Excel (.xlsx)</div>
+                <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">ملف إكسل منسق يضم ورقة ملخص الأطراف وورقة السجل الكامل</p>
+              </div>
+            </button>
+
+            <!-- Export JSON Backup -->
+            <button type="button" id="exportJsonBtn" class="p-4 rounded-xl border border-teal-200 dark:border-teal-800/70 bg-teal-50/50 hover:bg-teal-100/70 dark:bg-teal-950/30 dark:hover:bg-teal-950/60 text-right transition flex items-start gap-3.5">
+              <div class="w-10 h-10 rounded-xl bg-teal-600 text-white flex items-center justify-center shrink-0">
+                <i class="fa-solid fa-cloud-arrow-down text-lg"></i>
+              </div>
+              <div>
+                <div class="font-bold text-sm text-slate-900 dark:text-white">تصدير نسخة احتياطية (.json)</div>
+                <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">حفظ ملف البيانات الكامل لنقله إلى الموبايل أو اللابتوب</p>
+              </div>
+            </button>
+
+            <!-- Import JSON Backup -->
+            <label for="importJsonInput" class="cursor-pointer p-4 rounded-xl border border-indigo-200 dark:border-indigo-800/70 bg-indigo-50/50 hover:bg-indigo-100/70 dark:bg-indigo-950/30 dark:hover:bg-indigo-950/60 text-right transition flex items-start gap-3.5">
+              <div class="w-10 h-10 rounded-xl bg-indigo-600 text-white flex items-center justify-center shrink-0">
+                <i class="fa-solid fa-cloud-arrow-up text-lg"></i>
+              </div>
+              <div>
+                <div class="font-bold text-sm text-slate-900 dark:text-white">استيراد نسخة احتياطية (.json)</div>
+                <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">استعادة البيانات من ملف JSON محفوظ مسبقاً</p>
+              </div>
+              <input type="file" id="importJsonInput" accept=".json,application/json" class="hidden">
+            </label>
+
+            <!-- Download Standalone index.html -->
+            <button type="button" id="downloadStandaloneHtmlBtn" class="p-4 rounded-xl border border-sky-200 dark:border-sky-800/70 bg-sky-50/50 hover:bg-sky-100/70 dark:bg-sky-950/30 dark:hover:bg-sky-950/60 text-right transition flex items-start gap-3.5">
+              <div class="w-10 h-10 rounded-xl bg-sky-600 text-white flex items-center justify-center shrink-0">
+                <i class="fa-solid fa-code text-lg"></i>
+              </div>
+              <div>
+                <div class="font-bold text-sm text-slate-900 dark:text-white">تنزيل ملف التطبيق (index.html)</div>
+                <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">تحميل الكود المصدري الكامل لرفعه مباشرة على GitHub Pages</p>
+              </div>
+            </button>
+
+            <!-- Load Sample Data -->
+            <button type="button" id="loadSampleDataBtn" class="p-4 rounded-xl border border-amber-200 dark:border-amber-800/70 bg-amber-50/50 hover:bg-amber-100/70 dark:bg-amber-950/30 dark:hover:bg-amber-950/60 text-right transition flex items-start gap-3.5">
+              <div class="w-10 h-10 rounded-xl bg-amber-500 text-white flex items-center justify-center shrink-0">
+                <i class="fa-solid fa-wand-magic-sparkles text-lg"></i>
+              </div>
+              <div>
+                <div class="font-bold text-sm text-slate-900 dark:text-white">تحميل بيانات تجريبية (Sample)</div>
+                <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">تعبئة عمليات افتراضية واقعية لتجربة الرسوم البيانية والتقارير</p>
+              </div>
+            </button>
+
+            <!-- Factory Reset (Double Confirmation) -->
+            <button type="button" id="resetAllDataBtn" class="p-4 rounded-xl border border-rose-200 dark:border-rose-800/70 bg-rose-50/50 hover:bg-rose-100/70 dark:bg-rose-950/30 dark:hover:bg-rose-950/60 text-right transition flex items-start gap-3.5">
+              <div class="w-10 h-10 rounded-xl bg-rose-600 text-white flex items-center justify-center shrink-0">
+                <i class="fa-solid fa-trash-can text-lg"></i>
+              </div>
+              <div>
+                <div class="font-bold text-sm text-rose-700 dark:text-rose-300">مسح جميع البيانات (Reset)</div>
+                <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">تصفير السجل وإعادة التطبيق لحالته الافتراضية (بتأكيد مزدوج)</p>
+              </div>
+            </button>
+          </div>
+        </div>
+
+      </section>
+
+    </main>
+  </div>
+
+  <!-- ================= BOTTOM NAVIGATION BAR (Mobile) ================= -->
+  <nav class="md:hidden fixed bottom-0 inset-x-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur border-t border-slate-200 dark:border-slate-800 grid grid-cols-4 px-2 py-1.5 shadow-lg">
+    <button type="button" data-nav="entry" class="nav-btn flex flex-col items-center justify-center py-1.5 rounded-xl text-[11px] font-bold transition">
+      <i class="fa-solid fa-bolt text-base mb-0.5"></i>
+      <span>إدخال سريع</span>
+    </button>
+    <button type="button" data-nav="dashboard" class="nav-btn flex flex-col items-center justify-center py-1.5 rounded-xl text-[11px] font-bold transition">
+      <i class="fa-solid fa-chart-pie text-base mb-0.5"></i>
+      <span>لوحة التحكم</span>
+    </button>
+    <button type="button" data-nav="ledger" class="nav-btn flex flex-col items-center justify-center py-1.5 rounded-xl text-[11px] font-bold transition">
+      <i class="fa-solid fa-list-check text-base mb-0.5"></i>
+      <span>السجل الذكي</span>
+    </button>
+    <button type="button" data-nav="settings" class="nav-btn flex flex-col items-center justify-center py-1.5 rounded-xl text-[11px] font-bold transition">
+      <i class="fa-solid fa-sliders text-base mb-0.5"></i>
+      <span>الإعدادات</span>
+    </button>
+  </nav>
+
+  <!-- ================= MODAL: WHATSAPP REPORT BUILDER & CUSTOMIZER ================= -->
+  <div id="whatsAppModal" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+    <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 max-w-3xl w-full p-4 sm:p-6 shadow-xl space-y-4 animate-view my-auto max-h-[94vh] flex flex-col">
+      
+      <!-- Modal Header -->
+      <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3 shrink-0">
+        <div class="flex items-center gap-2.5">
+          <span class="w-9 h-9 rounded-xl bg-emerald-50 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
+            <i class="fa-brands fa-whatsapp text-xl"></i>
+          </span>
+          <div>
+            <h3 class="font-bold text-sm sm:text-base text-slate-900 dark:text-white">تخصيص ومشاركة تقرير الواتساب الذكي</h3>
+            <p class="text-[11px] text-slate-500 dark:text-slate-400">تحكم كامل في الأطراف، الفترة الزمنية، البنود الظاهرة، وعدد الحركات قبل النسخ</p>
+          </div>
+        </div>
+        <button type="button" id="closeWhatsAppModalBtn" class="w-8 h-8 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-center text-slate-500">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <!-- Modal Scrollable Body -->
+      <div class="overflow-y-auto space-y-4 pr-1 flex-1">
+        
+        <!-- 1. Report Scope Selector (الكل / طرف واحد / أطراف محددة) -->
+        <div class="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/70 space-y-2.5">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <label for="whatsAppScopeSelect" class="text-xs font-bold text-slate-700 dark:text-slate-200">
+              <i class="fa-solid fa-users text-teal-600 dark:text-teal-400 ml-1"></i>1. نطاق التقرير (الأطراف المشمولة):
+            </label>
+            <span class="text-[11px] text-slate-400">اختر الحساب الكامل أو طرفاً واحداً أو عدة أطراف</span>
+          </div>
+          <div id="whatsAppScopeButtons" class="grid grid-cols-2 sm:grid-cols-6 gap-1.5">
+            <!-- Populated dynamically by JS -->
+          </div>
+          <select id="whatsAppScopeSelect" class="hidden">
+            <option value="all">ملخص الحساب الكامل (الأطراف الأربعة)</option>
+          </select>
+
+          <!-- Multi-Group Checkboxes (Shown when 'custom' is selected) -->
+          <div id="waCustomGroupsWrap" class="hidden pt-2 border-t border-slate-200/70 dark:border-slate-700/70 flex flex-wrap items-center gap-3">
+            <!-- Populated dynamically by JS -->
+          </div>
+        </div>
+
+        <!-- 2. Filters & Limits Grid (الفترة الزمنية، نوع الحركة، عدد الحركات) -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <!-- Period Preset -->
+          <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/70">
+            <label for="waPeriodPreset" class="block text-[11px] font-bold text-slate-600 dark:text-slate-300 mb-1.5">
+              <i class="fa-regular fa-calendar text-teal-600 ml-1"></i>2. الفترة الزمنية للحركات:
+            </label>
+            <select id="waPeriodPreset" class="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-2.5 py-1.5 text-xs font-bold">
+              <option value="all">كل الأوقات (شامل)</option>
+              <option value="today">حركات اليوم فقط</option>
+              <option value="week">آخر 7 أيام (أسبوعي)</option>
+              <option value="month">هذا الشهر</option>
+              <option value="ledger_filter">حسب فلتر السجل الذكي الحالي</option>
+              <option value="custom_dates">فترة مخصصة (من - إلى)</option>
+            </select>
+          </div>
+
+          <!-- Transaction Type Filter in Report -->
+          <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/70">
+            <label for="waTxTypeFilter" class="block text-[11px] font-bold text-slate-600 dark:text-slate-300 mb-1.5">
+              <i class="fa-solid fa-filter text-teal-600 ml-1"></i>3. نوع الحركات المدرجة:
+            </label>
+            <select id="waTxTypeFilter" class="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-2.5 py-1.5 text-xs font-bold">
+              <option value="all">الكل (وارد + صرف + تحويل)</option>
+              <option value="in">الوارد / الإيداعات فقط</option>
+              <option value="out">الصرف / المسحوبات فقط</option>
+              <option value="transfer">التحويلات الداخلية فقط</option>
+            </select>
+          </div>
+
+          <!-- Number of Transactions to Include -->
+          <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/70">
+            <label for="waTxLimitSelect" class="block text-[11px] font-bold text-slate-600 dark:text-slate-300 mb-1.5">
+              <i class="fa-solid fa-list-ol text-teal-600 ml-1"></i>4. عدد الحركات في التقرير:
+            </label>
+            <select id="waTxLimitSelect" class="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-2.5 py-1.5 text-xs font-bold">
+              <option value="0">بدون حركات (الأرصدة فقط)</option>
+              <option value="5" selected>آخر 5 حركات</option>
+              <option value="10">آخر 10 حركات</option>
+              <option value="20">آخر 20 حركة</option>
+              <option value="9999">جميع الحركات المطابقة</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Custom Date Range Inputs (Shown when waPeriodPreset === 'custom_dates') -->
+        <div id="waCustomDatesWrap" class="hidden grid grid-cols-1 sm:grid-cols-2 gap-3 p-3 rounded-xl bg-teal-50/50 dark:bg-teal-950/30 border border-teal-200 dark:border-teal-800/70">
+          <div>
+            <label for="waDateFrom" class="block text-[11px] font-bold text-slate-600 dark:text-slate-300 mb-1">من تاريخ:</label>
+            <input type="date" id="waDateFrom" class="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-1.5 text-xs font-bold">
+          </div>
+          <div>
+            <label for="waDateTo" class="block text-[11px] font-bold text-slate-600 dark:border-slate-700 dark:text-slate-300 mb-1">إلى تاريخ:</label>
+            <input type="date" id="waDateTo" class="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-1.5 text-xs font-bold">
+          </div>
+        </div>
+
+        <!-- 3. Checkboxes for Sections & Details to Include (عناصر ومحتويات التقرير) -->
+        <div class="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/70 space-y-2.5">
+          <div class="text-xs font-bold text-slate-700 dark:text-slate-200">
+            <i class="fa-solid fa-sliders text-teal-600 ml-1"></i>5. تخصيص البنود الظاهرة داخل الرسالة:
+          </div>
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5 text-xs">
+            <label class="flex items-center gap-2 cursor-pointer font-semibold text-slate-700 dark:text-slate-300">
+              <input type="checkbox" id="waOptTotalBank" checked class="wa-opt-check rounded text-teal-600 focus:ring-teal-500">
+              <span>إجمالي البنك الكلي</span>
+            </label>
+            <label class="flex items-center gap-2 cursor-pointer font-semibold text-slate-700 dark:text-slate-300">
+              <input type="checkbox" id="waOptReconStatus" checked class="wa-opt-check rounded text-teal-600 focus:ring-teal-500">
+              <span>حالة المطابقة البنكية</span>
+            </label>
+            <label class="flex items-center gap-2 cursor-pointer font-semibold text-slate-700 dark:text-slate-300">
+              <input type="checkbox" id="waOptDetailedTotals" checked class="wa-opt-check rounded text-teal-600 focus:ring-teal-500">
+              <span>تفصيل (افتتاحي/وارد/صرف)</span>
+            </label>
+            <label class="flex items-center gap-2 cursor-pointer font-semibold text-slate-700 dark:text-slate-300">
+              <input type="checkbox" id="waOptCategoryBreakdown" class="wa-opt-check rounded text-teal-600 focus:ring-teal-500">
+              <span>ملخص المصروفات بالتصنيف</span>
+            </label>
+            <label class="flex items-center gap-2 cursor-pointer font-semibold text-slate-700 dark:text-slate-300">
+              <input type="checkbox" id="waOptSharePercent" checked class="wa-opt-check rounded text-teal-600 focus:ring-teal-500">
+              <span>نسب الحصص وحالة الرصيد</span>
+            </label>
+            <label class="flex items-center gap-2 cursor-pointer font-semibold text-slate-700 dark:text-slate-300">
+              <input type="checkbox" id="waOptRefNumbers" checked class="wa-opt-check rounded text-teal-600 focus:ring-teal-500">
+              <span>أرقام الإشعارات البنكية</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- 4. Custom Title & Closing Note -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label for="waCustomTitle" class="block text-[11px] font-bold text-slate-600 dark:text-slate-300 mb-1">عنوان مخصص للتقرير (اختياري):</label>
+            <input type="text" id="waCustomTitle" placeholder="اتركه فارغاً للعنوان التلقائي..."
+              class="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3 py-2 text-xs font-bold focus:outline-none focus:border-teal-600">
+          </div>
+          <div>
+            <label for="waCustomFooter" class="block text-[11px] font-bold text-slate-600 dark:text-slate-300 mb-1">ملاحظة ختامية للشركاء (اختياري):</label>
+            <input type="text" id="waCustomFooter" placeholder="مثال: يرجى مراجعة الأرصدة وإرسال الإشعارات..."
+              class="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3 py-2 text-xs font-bold focus:outline-none focus:border-teal-600">
+          </div>
+        </div>
+
+        <!-- 5. Editable Live Preview Textarea -->
+        <div>
+          <div class="flex items-center justify-between mb-1">
+            <label for="whatsAppReportTextarea" class="text-xs font-bold text-slate-600 dark:text-slate-300">معاينة النص (يمكنك أيضاً التعديل اليدوي المباشر هنا قبل النسخ):</label>
+            <button type="button" id="waRegenerateBtn" class="text-[11px] font-bold text-teal-600 dark:text-teal-400 hover:underline flex items-center gap-1">
+              <i class="fa-solid fa-rotate"></i>
+              <span>إعادة توليد النص</span>
+            </button>
+          </div>
+          <textarea id="whatsAppReportTextarea" rows="10"
+            class="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 p-3.5 text-xs font-mono leading-relaxed text-slate-800 dark:text-slate-100 focus:outline-none focus:border-teal-600"></textarea>
+        </div>
+
+      </div>
+
+      <!-- Modal Footer Actions -->
+      <div class="flex flex-wrap items-center justify-end gap-2.5 pt-2 border-t border-slate-100 dark:border-slate-800 shrink-0">
+        <button type="button" id="directSendWhatsAppBtn" class="py-2.5 px-4 rounded-xl bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/80 dark:hover:bg-emerald-900 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition">
+          <i class="fa-solid fa-paper-plane"></i>
+          <span>فتح في واتساب مباشرة</span>
+        </button>
+        <button type="button" id="copyWhatsAppTextBtn" class="flex-1 py-2.5 px-5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-sm transition">
+          <i class="fa-regular fa-copy"></i>
+          <span>نسخ النص إلى الحافظة</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MODAL: CONFIRMATION DIALOG (Delete / Reset / Sample) ================= -->
+  <div id="confirmModal" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 max-w-md w-full p-5 shadow-xl space-y-4 animate-view">
+      <div class="flex items-start gap-3">
+        <div id="confirmModalIcon" class="w-10 h-10 rounded-xl bg-rose-100 dark:bg-rose-950 text-rose-600 dark:text-rose-400 flex items-center justify-center shrink-0">
+          <i class="fa-solid fa-triangle-exclamation text-lg"></i>
+        </div>
+        <div class="space-y-1">
+          <h3 id="confirmModalTitle" class="font-bold text-base text-slate-900 dark:text-white">تأكيد الإجراء</h3>
+          <p id="confirmModalMessage" class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed"></p>
+        </div>
+      </div>
+
+      <!-- Optional step-2 confirmation checkbox for factory reset -->
+      <div id="confirmDoubleCheckWrap" class="hidden p-3 rounded-xl bg-rose-50 dark:bg-rose-950/50 border border-rose-200 dark:border-rose-800">
+        <label class="flex items-center gap-2 text-xs font-bold text-rose-700 dark:text-rose-300 cursor-pointer">
+          <input type="checkbox" id="confirmDoubleCheckbox" class="rounded text-rose-600 focus:ring-rose-500">
+          <span>نعم، أؤكد رغبتي النهائية في مسح جميع السجلات والبيانات</span>
+        </label>
+      </div>
+
+      <div class="flex items-center justify-end gap-2 pt-2">
+        <button type="button" id="confirmCancelBtn" class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-bold transition">
+          إلغاء
+        </button>
+        <button type="button" id="confirmProceedBtn" class="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold transition">
+          تأكيد التنفيذ
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= TOAST NOTIFICATION CONTAINER ================= -->
+  <div id="toastContainer" class="fixed bottom-20 md:bottom-6 left-4 z-50 flex flex-col gap-2 max-w-sm w-full pointer-events-none"></div>
+
+  <!-- ================= APPLICATION JAVASCRIPT ================= -->
+  <script>
+    (function () {
+      'use strict';
+
+      const STORAGE_KEY = 'shared_bank_4p_pwa_v1';
+
+      // Default color themes for the 4 fixed groupIds (g1, g2, g3, g4)
+      const GROUP_PALETTE = {
+        g1: { hex: '#0d9488', bgLight: 'bg-teal-50', textLight: 'text-teal-700', borderLight: 'border-teal-500', badge: 'bg-teal-100 text-teal-800 dark:bg-teal-950 dark:text-teal-300' },
+        g2: { hex: '#2563eb', bgLight: 'bg-blue-50', textLight: 'text-blue-700', borderLight: 'border-blue-500', badge: 'bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300' },
+        g3: { hex: '#7c3aed', bgLight: 'bg-violet-50', textLight: 'text-violet-700', borderLight: 'border-violet-500', badge: 'bg-violet-100 text-violet-800 dark:bg-violet-950 dark:text-violet-300' },
+        g4: { hex: '#d97706', bgLight: 'bg-amber-50', textLight: 'text-amber-700', borderLight: 'border-amber-500', badge: 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300' }
+      };
+
+      function getDefaultState() {
+        return {
+          meta: {
+            accountName: 'الحساب البنكي المشترك',
+            currency: 'ج.س',
+            actualBankBalance: '',
+            darkMode: false
+          },
+          groups: [
+            { id: 'g1', name: 'الطرف الأول', initialBalance: 0, minAlert: 50000 },
+            { id: 'g2', name: 'الطرف الثاني', initialBalance: 0, minAlert: 50000 },
+            { id: 'g3', name: 'الطرف الثالث', initialBalance: 0, minAlert: 50000 },
+            { id: 'g4', name: 'الطرف الرابع', initialBalance: 0, minAlert: 50000 }
+          ],
+          categories: {
+            out: ['مشتريات', 'فواتير وخدمات', 'تحويل بنكي صادر', 'سحب نقدي', 'عمولات بنكية', 'صيانة', 'أخرى'],
+            in: ['إيداع/تغذية', 'تحويل بنكي وارد', 'تصفية حساب', 'أرباح وعوائد', 'أخرى']
+          },
+          transactions: []
+        };
+      }
+
+      // Current runtime state
+      let state = loadState();
+      let currentView = 'entry';
+      let entryFormState = {
+        type: 'out',       // 'out' | 'in' | 'transfer'
+        groupId: 'g1',
+        fromGroupId: 'g1',
+        toGroupId: 'g2',
+        category: ''
+      };
+
+      // Chart instances
+      let barChartInstance = null;
+      let doughnutChartInstance = null;
+      let categoryChartInstance = null;
+
+      // Confirmation modal callback
+      let pendingConfirmAction = null;
+      let requireDoubleConfirm = false;
+
+      // ---------------- STORAGE HELPERS ----------------
+      function loadState() {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY);
+          if (!raw) return getDefaultState();
+          const parsed = JSON.parse(raw);
+          const def = getDefaultState();
+
+          // Ensure fixed g1..g4 integrity
+          const validIds = ['g1', 'g2', 'g3', 'g4'];
+          const mergedGroups = validIds.map((gid, idx) => {
+            const found = Array.isArray(parsed.groups) ? parsed.groups.find(g => g.id === gid) : null;
+            return {
+              id: gid,
+              name: found && found.name ? String(found.name).trim() : def.groups[idx].name,
+              initialBalance: found && !isNaN(Number(found.initialBalance)) ? Number(found.initialBalance) : 0,
+              minAlert: found && !isNaN(Number(found.minAlert)) ? Number(found.minAlert) : def.groups[idx].minAlert
+            };
+          });
+
+          return {
+            meta: Object.assign({}, def.meta, parsed.meta || {}),
+            groups: mergedGroups,
+            categories: {
+              out: Array.isArray(parsed.categories?.out) && parsed.categories.out.length ? parsed.categories.out : def.categories.out,
+              in: Array.isArray(parsed.categories?.in) && parsed.categories.in.length ? parsed.categories.in : def.categories.in
+            },
+            transactions: Array.isArray(parsed.transactions) ? parsed.transactions : []
+          };
+        } catch (err) {
+          return getDefaultState();
+        }
+      }
+
+      function saveState() {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        } catch (err) {
+          showToast('تعذر الحفظ في التخزين المحلي للمتصفح', 'error');
+        }
+      }
+
+      // ---------------- FORMATTING & CALCULATIONS ----------------
+      function formatNumber(num) {
+        const val = Number(num) || 0;
+        return val.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      }
+
+      function parseAmountInput(str) {
+        if (str === null || str === undefined) return NaN;
+        const cleaned = String(str).replace(/,/g, '').replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d)).trim();
+        if (cleaned === '') return NaN;
+        return Number(cleaned);
+      }
+
+      function getGroupById(gid) {
+        return state.groups.find(g => g.id === gid) || { id: gid, name: gid, initialBalance: 0, minAlert: 0 };
+      }
+
+      /**
+       * Computes comprehensive financial metrics for each of the 4 groups and overall bank.
+       */
+      function computeMetrics() {
+        const statsMap = {};
+        state.groups.forEach(g => {
+          statsMap[g.id] = {
+            id: g.id,
+            name: g.name,
+            initialBalance: Number(g.initialBalance) || 0,
+            minAlert: Number(g.minAlert) || 0,
+            deposits: 0,
+            withdrawals: 0,
+            transferIn: 0,
+            transferOut: 0,
+            netTransfers: 0,
+            totalInWithInitial: Number(g.initialBalance) || 0,
+            currentBalance: Number(g.initialBalance) || 0,
+            sharePercent: 0,
+            status: 'safe' // 'safe' | 'low' | 'overdraft'
+          };
+        });
+
+        let totalDeposits = 0;
+        let totalWithdrawals = 0;
+        let outTxCount = 0;
+
+        state.transactions.forEach(tx => {
+          const amt = Number(tx.amount) || 0;
+          if (amt <= 0) return;
+
+          if (tx.type === 'in' && statsMap[tx.groupId]) {
+            statsMap[tx.groupId].deposits += amt;
+            totalDeposits += amt;
+          } else if (tx.type === 'out' && statsMap[tx.groupId]) {
+            statsMap[tx.groupId].withdrawals += amt;
+            totalWithdrawals += amt;
+            outTxCount++;
+          } else if (tx.type === 'transfer') {
+            if (statsMap[tx.fromGroupId]) statsMap[tx.fromGroupId].transferOut += amt;
+            if (statsMap[tx.toGroupId]) statsMap[tx.toGroupId].transferIn += amt;
+          }
+        });
+
+        let totalInitial = 0;
+        let totalBookBalance = 0;
+        let positiveBalancesSum = 0;
+
+        state.groups.forEach(g => {
+          const st = statsMap[g.id];
+          totalInitial += st.initialBalance;
+          st.netTransfers = st.transferIn - st.transferOut;
+          st.totalInWithInitial = st.initialBalance + st.deposits + st.transferIn;
+          st.currentBalance = st.initialBalance + st.deposits - st.withdrawals + st.netTransfers;
+          totalBookBalance += st.currentBalance;
+          if (st.currentBalance > 0) {
+            positiveBalancesSum += st.currentBalance;
+          }
+
+          if (st.currentBalance < 0) {
+            st.status = 'overdraft';
+          } else if (st.currentBalance <= st.minAlert) {
+            st.status = 'low';
+          } else {
+            st.status = 'safe';
+          }
+        });
+
+        state.groups.forEach(g => {
+          const st = statsMap[g.id];
+          if (positiveBalancesSum > 0 && st.currentBalance > 0) {
+            st.sharePercent = (st.currentBalance / positiveBalancesSum) * 100;
+          } else {
+            st.sharePercent = 0;
+          }
+        });
+
+        return {
+          groups: state.groups.map(g => statsMap[g.id]),
+          byId: statsMap,
+          totalInitial,
+          totalDeposits,
+          totalInWithInitial: totalInitial + totalDeposits,
+          totalWithdrawals,
+          outTxCount,
+          totalBookBalance,
+          positiveBalancesSum
+        };
+      }
+
+      // ---------------- TOAST NOTIFICATIONS ----------------
+      function showToast(message, type = 'success') {
+        const container = document.getElementById('toastContainer');
+        if (!container) return;
+
+        const colors = {
+          success: 'bg-emerald-600 text-white border-emerald-500',
+          warning: 'bg-amber-500 text-white border-amber-400',
+          error: 'bg-rose-600 text-white border-rose-500',
+          info: 'bg-slate-800 text-white border-slate-700'
+        };
+        const icons = {
+          success: 'fa-circle-check',
+          warning: 'fa-triangle-exclamation',
+          error: 'fa-circle-xmark',
+          info: 'fa-circle-info'
+        };
+
+        const toast = document.createElement('div');
+        toast.className = `pointer-events-auto flex items-center gap-2.5 px-4 py-3 rounded-xl shadow-lg border text-xs sm:text-sm font-bold animate-view ${colors[type] || colors.success}`;
+        toast.innerHTML = `
+          <i class="fa-solid ${icons[type] || icons.success} text-base"></i>
+          <span class="flex-1">${escapeHtml(message)}</span>
+        `;
+        container.appendChild(toast);
+
+        setTimeout(() => {
+          toast.style.opacity = '0';
+          toast.style.transition = 'opacity 0.25s ease';
+          setTimeout(() => toast.remove(), 260);
+        }, 3200);
+      }
+
+      function escapeHtml(str) {
+        return String(str || '')
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#039;');
+      }
+
+      // ---------------- THEME MANAGEMENT ----------------
+      function applyTheme() {
+        const root = document.documentElement;
+        const desktopText = document.getElementById('themeToggleDesktopText');
+        if (state.meta.darkMode) {
+          root.classList.add('dark');
+          root.classList.remove('light');
+          if (desktopText) desktopText.textContent = 'الوضع الفاتح';
+        } else {
+          root.classList.remove('dark');
+          root.classList.add('light');
+          if (desktopText) desktopText.textContent = 'الوضع الليلي';
+        }
+        if (currentView === 'dashboard') {
+          renderCharts();
+        }
+      }
+
+      function toggleTheme() {
+        state.meta.darkMode = !state.meta.darkMode;
+        saveState();
+        applyTheme();
+      }
+
+      // ---------------- NAVIGATION ----------------
+      function switchView(viewName) {
+        currentView = viewName;
+        document.querySelectorAll('.app-view').forEach(sec => {
+          sec.classList.toggle('hidden', sec.id !== `view-${viewName}`);
+        });
+
+        document.querySelectorAll('.nav-btn').forEach(btn => {
+          const target = btn.getAttribute('data-nav');
+          if (!target) return;
+          const isActive = target === viewName;
+          if (btn.closest('aside')) {
+            btn.className = isActive
+              ? 'nav-btn w-full flex items-center gap-3.5 px-4 py-3.5 rounded-xl font-bold text-sm transition-all bg-teal-600 text-white shadow-sm shadow-teal-600/20'
+              : 'nav-btn w-full flex items-center gap-3.5 px-4 py-3.5 rounded-xl font-bold text-sm transition-all text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800';
+          } else if (btn.closest('nav.md\\:hidden')) {
+            btn.className = isActive
+              ? 'nav-btn flex flex-col items-center justify-center py-1.5 rounded-xl text-[11px] font-bold transition text-teal-600 dark:text-teal-400 bg-teal-50/80 dark:bg-teal-950/60'
+              : 'nav-btn flex flex-col items-center justify-center py-1.5 rounded-xl text-[11px] font-bold transition text-slate-500 dark:text-slate-400';
+          }
+        });
+
+        refreshAllUI();
+      }
+
+      // ---------------- MASTER UI RENDER ----------------
+      function refreshAllUI() {
+        const metrics = computeMetrics();
+        renderTopStripAndSidebar(metrics);
+        renderQuickEntryView(metrics);
+        renderDashboardView(metrics);
+        renderLedgerView(metrics);
+        renderSettingsView(metrics);
+      }
+
+      // 1. Top Live Balance Strip & Sidebar Summary
+      function renderTopStripAndSidebar(metrics) {
+        const cur = state.meta.currency || 'ج.س';
+        document.getElementById('stripTotalBankBalance').textContent = formatNumber(metrics.totalBookBalance);
+        document.getElementById('stripCurrencyLabel').textContent = cur;
+        document.getElementById('entryCurrencySuffix').textContent = cur;
+        document.getElementById('sidebarTotalBalance').textContent = `${formatNumber(metrics.totalBookBalance)} ${cur}`;
+
+        // Show sample data button if no transactions yet and all initial balances are 0
+        const isEmpty = state.transactions.length === 0 && metrics.totalInitial === 0;
+        const sampleBtn = document.getElementById('stripSampleDataBtn');
+        if (sampleBtn) sampleBtn.classList.toggle('hidden', !isEmpty);
+
+        // Reconciliation status in strip & sidebar
+        const actualRaw = state.meta.actualBankBalance;
+        const actualNum = parseAmountInput(actualRaw);
+        const stripRecon = document.getElementById('stripReconIndicator');
+        const sidebarRecon = document.getElementById('sidebarReconBadge');
+
+        if (!isNaN(actualNum) && String(actualRaw).trim() !== '') {
+          const diff = actualNum - metrics.totalBookBalance;
+          if (Math.abs(diff) < 0.005) {
+            stripRecon.className = 'text-xs px-2.5 py-1 rounded-full font-bold bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300';
+            stripRecon.textContent = '✅ مطابق تماماً لتطبيق البنك';
+            sidebarRecon.innerHTML = '<span class="text-emerald-600 dark:text-emerald-400">✅ مطابق لتطبيق البنك</span>';
+          } else {
+            stripRecon.className = 'text-xs px-2.5 py-1 rounded-full font-bold bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300';
+            const sign = diff > 0 ? '+' : '';
+            stripRecon.textContent = `⚠️ فرق غير مسجل: ${sign}${formatNumber(diff)} ${cur}`;
+            sidebarRecon.innerHTML = `<span class="text-amber-600 dark:text-amber-400">⚠️ فرق: ${sign}${formatNumber(diff)}</span>`;
+          }
+        } else {
+          stripRecon.className = 'text-xs px-2.5 py-1 rounded-full font-semibold bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300';
+          stripRecon.textContent = 'الرصيد الفعلي غير محدد';
+          sidebarRecon.innerHTML = '<span>لم تتم المطابقة بعد</span>';
+        }
+
+        // 4 Group Cards in Live Strip
+        const grid = document.getElementById('liveBalanceStripGrid');
+        grid.innerHTML = metrics.groups.map(g => {
+          const pal = GROUP_PALETTE[g.id] || GROUP_PALETTE.g1;
+          let statusBadge = '';
+          let balanceColor = 'text-slate-900 dark:text-white';
+          if (g.status === 'overdraft') {
+            statusBadge = '<span class="text-[10px] px-1.5 py-0.5 rounded bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300 font-bold">مكشوف</span>';
+            balanceColor = 'text-rose-600 dark:text-rose-400';
+          } else if (g.status === 'low') {
+            statusBadge = '<span class="text-[10px] px-1.5 py-0.5 rounded bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300 font-bold">قارب النفاد</span>';
+            balanceColor = 'text-amber-600 dark:text-amber-400';
+          } else {
+            statusBadge = `<span class="text-[10px] px-1.5 py-0.5 rounded ${pal.badge} font-bold">${g.sharePercent.toFixed(0)}%</span>`;
+          }
+
+          return `
+            <div class="p-3 rounded-xl bg-slate-50/90 dark:bg-slate-800/70 border border-slate-200/80 dark:border-slate-700/70 flex flex-col justify-between">
+              <div class="flex items-center justify-between gap-1 mb-1">
+                <span class="font-bold text-xs text-slate-700 dark:text-slate-200 truncate">${escapeHtml(g.name)}</span>
+                ${statusBadge}
+              </div>
+              <div class="flex items-baseline justify-between gap-1">
+                <span class="font-extrabold text-sm sm:text-base ${balanceColor} num-ltr">${formatNumber(g.currentBalance)}</span>
+                <span class="text-[10px] text-slate-400">${escapeHtml(cur)}</span>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      // 2. Render Quick Entry View
+      function renderQuickEntryView(metrics) {
+        const cur = state.meta.currency || 'ج.س';
+
+        // Transaction Type Buttons
+        document.querySelectorAll('.tx-type-btn').forEach(btn => {
+          const t = btn.getAttribute('data-tx-type');
+          const active = t === entryFormState.type;
+          if (t === 'out') {
+            btn.className = active
+              ? 'tx-type-btn py-3.5 px-3 rounded-xl border-2 font-bold text-sm flex flex-col sm:flex-row items-center justify-center gap-1.5 transition-all bg-rose-600 text-white border-rose-600 shadow-sm shadow-rose-600/20'
+              : 'tx-type-btn py-3.5 px-3 rounded-xl border-2 font-bold text-sm flex flex-col sm:flex-row items-center justify-center gap-1.5 transition-all border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:border-rose-300';
+          } else if (t === 'in') {
+            btn.className = active
+              ? 'tx-type-btn py-3.5 px-3 rounded-xl border-2 font-bold text-sm flex flex-col sm:flex-row items-center justify-center gap-1.5 transition-all bg-emerald-600 text-white border-emerald-600 shadow-sm shadow-emerald-600/20'
+              : 'tx-type-btn py-3.5 px-3 rounded-xl border-2 font-bold text-sm flex flex-col sm:flex-row items-center justify-center gap-1.5 transition-all border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:border-emerald-300';
+          } else {
+            btn.className = active
+              ? 'tx-type-btn py-3.5 px-3 rounded-xl border-2 font-bold text-sm flex flex-col sm:flex-row items-center justify-center gap-1.5 transition-all bg-indigo-600 text-white border-indigo-600 shadow-sm shadow-indigo-600/20'
+              : 'tx-type-btn py-3.5 px-3 rounded-xl border-2 font-bold text-sm flex flex-col sm:flex-row items-center justify-center gap-1.5 transition-all border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:border-indigo-300';
+          }
+        });
+
+        // Toggle between single group radio cards vs internal transfer selectors
+        const isTransfer = entryFormState.type === 'transfer';
+        document.getElementById('singleGroupSelectorWrap').classList.toggle('hidden', isTransfer);
+        document.getElementById('transferGroupSelectorWrap').classList.toggle('hidden', !isTransfer);
+        document.getElementById('categorySelectorWrap').classList.toggle('hidden', isTransfer);
+
+        // Radio Cards for the 4 groups
+        const cardsGrid = document.getElementById('entryGroupCardsGrid');
+        cardsGrid.innerHTML = metrics.groups.map(g => {
+          const isSelected = g.id === entryFormState.groupId;
+          const borderClass = isSelected
+            ? 'border-teal-600 dark:border-teal-400 bg-teal-50/70 dark:bg-teal-950/50 ring-2 ring-teal-500/20'
+            : 'border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/50 hover:border-slate-300';
+          const balClass = g.currentBalance < 0 ? 'text-rose-600 dark:text-rose-400' : 'text-slate-900 dark:text-white';
+          return `
+            <button type="button" data-select-group="${g.id}" class="p-3.5 rounded-xl border-2 text-right transition-all flex flex-col justify-between ${borderClass}">
+              <div class="flex items-center justify-between w-full mb-1">
+                <span class="font-bold text-xs sm:text-sm text-slate-800 dark:text-slate-100 truncate">${escapeHtml(g.name)}</span>
+                <span class="w-4 h-4 rounded-full border flex items-center justify-center ${isSelected ? 'border-teal-600 bg-teal-600 text-white' : 'border-slate-300 dark:border-slate-600'}">
+                  ${isSelected ? '<i class="fa-solid fa-check text-[9px]"></i>' : ''}
+                </span>
+              </div>
+              <div class="text-[11px] text-slate-500 dark:text-slate-400">
+                المتاح: <span class="font-extrabold ${balClass} num-ltr">${formatNumber(g.currentBalance)}</span> ${escapeHtml(cur)}
+              </div>
+            </button>
+          `;
+        }).join('');
+
+        // Populate Transfer Dropdowns
+        const fromSel = document.getElementById('transferFromGroup');
+        const toSel = document.getElementById('transferToGroup');
+        const optionsHtml = metrics.groups.map(g => `<option value="${g.id}">${escapeHtml(g.name)} (المتاح: ${formatNumber(g.currentBalance)} ${escapeHtml(cur)})</option>`).join('');
+        fromSel.innerHTML = optionsHtml;
+        toSel.innerHTML = optionsHtml;
+        fromSel.value = entryFormState.fromGroupId;
+        toSel.value = entryFormState.toGroupId;
+
+        // Category Chips
+        if (!isTransfer) {
+          const catList = entryFormState.type === 'in' ? state.categories.in : state.categories.out;
+          if (!catList.includes(entryFormState.category)) {
+            entryFormState.category = catList[0] || 'أخرى';
+          }
+          const chipsWrap = document.getElementById('entryCategoryChips');
+          chipsWrap.innerHTML = catList.map(cat => {
+            const active = cat === entryFormState.category;
+            const cls = active
+              ? 'px-3.5 py-2 rounded-xl text-xs font-bold bg-teal-600 text-white shadow-xs transition'
+              : 'px-3.5 py-2 rounded-xl text-xs font-bold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition';
+            return `<button type="button" data-select-cat="${escapeHtml(cat)}" class="${cls}">${escapeHtml(cat)}</button>`;
+          }).join('');
+        }
+
+        // Update Live Overdraft & Balance Impact Preview
+        updateLiveEntryPreview(metrics);
+
+        // Quick Reconciliation Input sync
+        const quickActualInput = document.getElementById('quickActualBankInput');
+        if (document.activeElement !== quickActualInput) {
+          quickActualInput.value = state.meta.actualBankBalance || '';
+        }
+        renderQuickReconciliationBox(metrics);
+
+        // Render Last 5 Operations
+        renderRecentTransactionsFeed(metrics);
+      }
+
+      function updateLiveEntryPreview(metrics) {
+        const cur = state.meta.currency || 'ج.س';
+        const rawAmt = document.getElementById('entryAmount').value;
+        const amt = parseAmountInput(rawAmt);
+        const validAmt = !isNaN(amt) && amt > 0 ? amt : 0;
+
+        // If editing an existing transaction, revert its old effect before computing preview
+        const editingId = document.getElementById('editingTxId').value;
+        const existingTx = editingId ? state.transactions.find(t => t.id === editingId) : null;
+
+        const alertBox = document.getElementById('overdraftAlertBox');
+        const alertDetails = document.getElementById('overdraftAlertDetails');
+        const previewValue = document.getElementById('afterBalancePreviewValue');
+
+        if (entryFormState.type === 'transfer') {
+          const fromGroup = metrics.byId[entryFormState.fromGroupId];
+          const toGroup = metrics.byId[entryFormState.toGroupId];
+          if (!fromGroup || !toGroup) return;
+
+          let availFrom = fromGroup.currentBalance;
+          if (existingTx && existingTx.type === 'transfer' && existingTx.fromGroupId === fromGroup.id) {
+            availFrom += Number(existingTx.amount) || 0;
+          }
+          const afterFrom = availFrom - validAmt;
+          previewValue.textContent = `${fromGroup.name}: ${formatNumber(afterFrom)} ${cur}`;
+
+          if (validAmt > 0 && afterFrom < 0) {
+            alertBox.classList.remove('hidden');
+            alertDetails.textContent = `مبلغ التحويل (${formatNumber(validAmt)} ${cur}) يتجاوز الرصيد المتاح للطرف "${fromGroup.name}" (${formatNumber(availFrom)} ${cur}) بمقدار ${formatNumber(Math.abs(afterFrom))} ${cur}.`;
+          } else {
+            alertBox.classList.add('hidden');
+          }
+          return;
+        }
+
+        const g = metrics.byId[entryFormState.groupId];
+        if (!g) return;
+
+        let avail = g.currentBalance;
+        if (existingTx && existingTx.groupId === g.id) {
+          if (existingTx.type === 'out') avail += Number(existingTx.amount) || 0;
+          if (existingTx.type === 'in') avail -= Number(existingTx.amount) || 0;
+        }
+
+        const after = entryFormState.type === 'out' ? (avail - validAmt) : (avail + validAmt);
+        previewValue.textContent = `${g.name}: ${formatNumber(after)} ${cur}`;
+        previewValue.className = `font-bold text-sm num-ltr ${after < 0 ? 'text-rose-600 dark:text-rose-400' : 'text-emerald-600 dark:text-emerald-400'}`;
+
+        if (entryFormState.type === 'out' && validAmt > 0 && after < 0) {
+          alertBox.classList.remove('hidden');
+          alertDetails.textContent = `المبلغ المطلوب صرفه (${formatNumber(validAmt)} ${cur}) أكبر من الرصيد المتاح لـ "${g.name}" (${formatNumber(avail)} ${cur}). سيؤدي ذلك إلى سحب على المكشوف من سيولة الشركاء بمقدار (${formatNumber(Math.abs(after))} ${cur}).`;
+        } else {
+          alertBox.classList.add('hidden');
+        }
+      }
+
+      function renderQuickReconciliationBox(metrics) {
+        const cur = state.meta.currency || 'ج.س';
+        const actualRaw = state.meta.actualBankBalance;
+        const actualNum = parseAmountInput(actualRaw);
+        const box = document.getElementById('quickReconStatusBox');
+
+        if (isNaN(actualNum) || String(actualRaw).trim() === '') {
+          box.className = 'p-3 rounded-xl text-xs font-semibold flex items-center justify-between bg-slate-50 dark:bg-slate-800/70 text-slate-500 dark:text-slate-400 border border-slate-200/60 dark:border-slate-700';
+          box.innerHTML = '<span>أدخل رصيد تطبيق البنك للمقارنة الفورية</span>';
+          return;
+        }
+
+        const diff = actualNum - metrics.totalBookBalance;
+        if (Math.abs(diff) < 0.005) {
+          box.className = 'p-3 rounded-xl text-xs font-bold flex items-center justify-between bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800';
+          box.innerHTML = `<span>✅ مطابق تماماً مع الرصيد الدفتري</span><span class="num-ltr">0.00 ${escapeHtml(cur)}</span>`;
+        } else {
+          const sign = diff > 0 ? '+' : '';
+          const explain = diff > 0 ? 'زيادة في البنك غير مسجلة' : 'نقص في البنك غير مسجل';
+          box.className = 'p-3 rounded-xl text-xs font-bold flex flex-col sm:flex-row sm:items-center justify-between gap-1 bg-amber-50 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800';
+          box.innerHTML = `<span>⚠️ يوجد فرق غير مسجل (${explain})</span><span class="num-ltr text-sm">${sign}${formatNumber(diff)} ${escapeHtml(cur)}</span>`;
+        }
+      }
+
+      function renderRecentTransactionsFeed() {
+        const cur = state.meta.currency || 'ج.س';
+        const container = document.getElementById('recentTransactionsList');
+        const sorted = [...state.transactions].sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 5);
+
+        if (sorted.length === 0) {
+          container.innerHTML = `
+            <div class="py-8 text-center text-xs text-slate-400 space-y-2">
+              <i class="fa-solid fa-receipt text-2xl block text-slate-300 dark:text-slate-700"></i>
+              <p>لا توجد حركات مسجلة بعد. ابدأ بإضافة أول عملية من النموذج، أو قم بتحميل بيانات تجريبية.</p>
+            </div>
+          `;
+          return;
+        }
+
+        container.innerHTML = sorted.map(tx => {
+          let badge = '';
+          let title = '';
+          let amtColor = '';
+          let sign = '';
+
+          if (tx.type === 'in') {
+            badge = '<span class="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0"><i class="fa-solid fa-arrow-up"></i></span>';
+            title = `${getGroupById(tx.groupId).name} • ${tx.category}`;
+            amtColor = 'text-emerald-600 dark:text-emerald-400';
+            sign = '+';
+          } else if (tx.type === 'out') {
+            badge = '<span class="w-8 h-8 rounded-lg bg-rose-50 dark:bg-rose-950 text-rose-600 dark:text-rose-400 flex items-center justify-center shrink-0"><i class="fa-solid fa-arrow-down"></i></span>';
+            title = `${getGroupById(tx.groupId).name} • ${tx.category}`;
+            amtColor = 'text-rose-600 dark:text-rose-400';
+            sign = '-';
+          } else {
+            badge = '<span class="w-8 h-8 rounded-lg bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0"><i class="fa-solid fa-right-left"></i></span>';
+            title = `تحويل: ${getGroupById(tx.fromGroupId).name} ← ${getGroupById(tx.toGroupId).name}`;
+            amtColor = 'text-indigo-600 dark:text-indigo-400';
+            sign = '';
+          }
+
+          const dateFormatted = formatShortDate(tx.date);
+          return `
+            <div class="p-3 rounded-xl bg-slate-50/80 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 flex items-center justify-between gap-2">
+              <div class="flex items-center gap-2.5 min-w-0">
+                ${badge}
+                <div class="min-w-0">
+                  <div class="font-bold text-xs text-slate-800 dark:text-slate-100 truncate">${escapeHtml(title)}</div>
+                  <div class="text-[11px] text-slate-400 truncate">${escapeHtml(tx.comment || 'بدون بيان')} • ${escapeHtml(dateFormatted)}</div>
+                </div>
+              </div>
+              <div class="text-left shrink-0">
+                <div class="font-extrabold text-xs sm:text-sm ${amtColor} num-ltr">${sign}${formatNumber(tx.amount)}</div>
+                <div class="text-[10px] text-slate-400">${escapeHtml(cur)}</div>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      // 3. Render Dashboard & Analytics View
+      function renderDashboardView(metrics) {
+        const cur = state.meta.currency || 'ج.س';
+
+        // KPIs
+        document.getElementById('kpiBookBalance').textContent = `${formatNumber(metrics.totalBookBalance)} ${cur}`;
+        document.getElementById('kpiTotalIn').textContent = `${formatNumber(metrics.totalInWithInitial)} ${cur}`;
+        document.getElementById('kpiTotalInSub').textContent = `إيداعات: ${formatNumber(metrics.totalDeposits)} + افتتاحي: ${formatNumber(metrics.totalInitial)}`;
+        document.getElementById('kpiTotalOut').textContent = `${formatNumber(metrics.totalWithdrawals)} ${cur}`;
+        document.getElementById('kpiTotalOutCount').textContent = `${metrics.outTxCount} عملية صرف مسجلة`;
+
+        // Sync Actual Bank Input
+        const dashInput = document.getElementById('dashboardActualBankInput');
+        if (document.activeElement !== dashInput) {
+          dashInput.value = state.meta.actualBankBalance || '';
+        }
+
+        const actualRaw = state.meta.actualBankBalance;
+        const actualNum = parseAmountInput(actualRaw);
+        const kpiReconTitle = document.getElementById('kpiReconTitle');
+        const kpiReconSub = document.getElementById('kpiReconSub');
+        const banner = document.getElementById('dashboardReconResultBanner');
+
+        if (isNaN(actualNum) || String(actualRaw).trim() === '') {
+          kpiReconTitle.textContent = 'غير محدد';
+          kpiReconTitle.className = 'text-sm sm:text-base font-extrabold text-slate-500 dark:text-slate-400';
+          kpiReconSub.textContent = 'أدخل رصيد التطبيق بالأسفل';
+
+          banner.className = 'mt-4 p-4 rounded-xl border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-slate-50 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700';
+          banner.innerHTML = `
+            <div class="text-xs text-slate-600 dark:text-slate-300">
+              الرصيد الدفتري المسجل حالياً هو <strong class="num-ltr">${formatNumber(metrics.totalBookBalance)} ${escapeHtml(cur)}</strong>. أدخل الرصيد الفعلي من تطبيق البنك للتحقق من المطابقة.
+            </div>
+          `;
+        } else {
+          const diff = actualNum - metrics.totalBookBalance;
+          if (Math.abs(diff) < 0.005) {
+            kpiReconTitle.textContent = '✅ مطابق تماماً';
+            kpiReconTitle.className = 'text-sm sm:text-base font-extrabold text-emerald-600 dark:text-emerald-400';
+            kpiReconSub.textContent = 'الفرق = 0.00';
+
+            banner.className = 'mt-4 p-4 rounded-xl border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-emerald-50 dark:bg-emerald-950/60 border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-200';
+            banner.innerHTML = `
+              <div class="flex items-center gap-2.5 text-xs sm:text-sm font-bold">
+                <i class="fa-solid fa-circle-check text-lg text-emerald-600 dark:text-emerald-400"></i>
+                <span>✅ مطابق تماماً! الرصيد الفعلي في تطبيق البنك يطابق إجمالي أرصدة الأطراف الأربعة المسجلة.</span>
+              </div>
+              <div class="font-extrabold text-sm num-ltr">الفرق: 0.00 ${escapeHtml(cur)}</div>
+            `;
+          } else {
+            const sign = diff > 0 ? '+' : '';
+            kpiReconTitle.textContent = '⚠️ يوجد فرق غير مسجل';
+            kpiReconTitle.className = 'text-sm sm:text-base font-extrabold text-amber-600 dark:text-amber-400';
+            kpiReconSub.textContent = `الفرق: ${sign}${formatNumber(diff)} ${cur}`;
+
+            const guidance = diff > 0
+              ? 'يوجد مبلغ فائض في تطبيق البنك لم يتم تسجيله كـ "وارد / إيداع" في النظام.'
+              : 'يوجد مبلغ ناقص من تطبيق البنك لم يتم تسجيله كـ "صرف / سحب" أو "عمولة بنكية" في النظام.';
+
+            banner.className = 'mt-4 p-4 rounded-xl border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-amber-50 dark:bg-amber-950/60 border-amber-300 dark:border-amber-800 text-amber-900 dark:text-amber-200';
+            banner.innerHTML = `
+              <div class="space-y-1">
+                <div class="font-bold text-xs sm:text-sm">⚠️ يوجد فرق غير مسجل بمقدار <span class="num-ltr underline">${sign}${formatNumber(diff)} ${escapeHtml(cur)}</span></div>
+                <p class="text-xs opacity-90">${escapeHtml(guidance)}</p>
+              </div>
+              <div class="text-xs font-bold shrink-0 bg-white/80 dark:bg-slate-900/80 px-3 py-2 rounded-lg border border-amber-200 dark:border-amber-800">
+                الفعلي: <span class="num-ltr">${formatNumber(actualNum)}</span> | الدفتري: <span class="num-ltr">${formatNumber(metrics.totalBookBalance)}</span>
+              </div>
+            `;
+          }
+        }
+
+        // Table of the 4 Groups
+        const tbody = document.getElementById('dashboardGroupsTableBody');
+        tbody.innerHTML = metrics.groups.map(g => {
+          let statusHtml = '';
+          if (g.status === 'overdraft') {
+            statusHtml = '<span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300">🚨 مكشوف بالسالب</span>';
+          } else if (g.status === 'low') {
+            statusHtml = '<span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300">⚠️ قارب على النفاد</span>';
+          } else {
+            statusHtml = '<span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300">✅ آمن</span>';
+          }
+
+          const netTransSign = g.netTransfers > 0 ? '+' : '';
+          const netTransColor = g.netTransfers > 0 ? 'text-emerald-600' : (g.netTransfers < 0 ? 'text-rose-600' : 'text-slate-400');
+
+          return `
+            <tr class="hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition">
+              <td class="py-3.5 px-4 font-bold text-slate-900 dark:text-white">
+                <div class="flex items-center justify-between gap-2">
+                  <span>${escapeHtml(g.name)}</span>
+                  <button type="button" data-wa-group="${g.id}" title="نسخ ملخص واتساب خاص بـ ${escapeHtml(g.name)}" class="px-2 py-1 rounded-lg bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/70 dark:hover:bg-emerald-900 text-emerald-600 dark:text-emerald-400 text-[11px] font-bold inline-flex items-center gap-1 transition">
+                    <i class="fa-brands fa-whatsapp"></i>
+                    <span class="hidden sm:inline">ملخص</span>
+                  </button>
+                </div>
+              </td>
+              <td class="py-3.5 px-4 font-semibold num-ltr">${formatNumber(g.initialBalance)}</td>
+              <td class="py-3.5 px-4 font-bold text-emerald-600 dark:text-emerald-400 num-ltr">+${formatNumber(g.deposits)}</td>
+              <td class="py-3.5 px-4 font-bold text-rose-600 dark:text-rose-400 num-ltr">-${formatNumber(g.withdrawals)}</td>
+              <td class="py-3.5 px-4 font-bold ${netTransColor} num-ltr">${netTransSign}${formatNumber(g.netTransfers)}</td>
+              <td class="py-3.5 px-4 font-extrabold text-sm ${g.currentBalance < 0 ? 'text-rose-600 dark:text-rose-400' : 'text-slate-900 dark:text-white'} num-ltr">${formatNumber(g.currentBalance)} ${escapeHtml(cur)}</td>
+              <td class="py-3.5 px-4">
+                <div class="flex items-center gap-2">
+                  <div class="w-16 h-2 rounded-full bg-slate-200 dark:bg-slate-700 overflow-hidden">
+                    <div class="h-full bg-teal-600" style="width: ${Math.min(100, Math.max(0, g.sharePercent))}%"></div>
+                  </div>
+                  <span class="text-xs font-bold num-ltr">${g.sharePercent.toFixed(1)}%</span>
+                </div>
+              </td>
+              <td class="py-3.5 px-4">${statusHtml}</td>
+            </tr>
+          `;
+        }).join('');
+
+        // Populate Category Chart Group Filter
+        const catFilter = document.getElementById('categoryChartGroupFilter');
+        const currentFilterVal = catFilter.value || 'all';
+        catFilter.innerHTML = `<option value="all">جميع الأطراف الأربعة</option>` +
+          metrics.groups.map(g => `<option value="${g.id}">${escapeHtml(g.name)}</option>`).join('');
+        catFilter.value = currentFilterVal;
+
+        if (currentView === 'dashboard') {
+          renderCharts(metrics);
+        }
+      }
+
+      // Render Interactive Charts (Chart.js)
+      function renderCharts(passedMetrics) {
+        if (typeof Chart === 'undefined') return;
+        const metrics = passedMetrics || computeMetrics();
+        const isDark = state.meta.darkMode;
+        const textColor = isDark ? '#cbd5e1' : '#475569';
+        const gridColor = isDark ? 'rgba(148, 163, 184, 0.12)' : 'rgba(148, 163, 184, 0.25)';
+
+        Chart.defaults.font.family = "'Tajawal', 'Cairo', sans-serif";
+        Chart.defaults.color = textColor;
+
+        // 1. Bar Chart: In, Out, Remaining for the 4 groups
+        const barCtx = document.getElementById('groupsBarChart');
+        if (barCtx) {
+          if (barChartInstance) barChartInstance.destroy();
+          barChartInstance = new Chart(barCtx, {
+            type: 'bar',
+            data: {
+              labels: metrics.groups.map(g => g.name),
+              datasets: [
+                {
+                  label: 'إجمالي الوارد (مع الافتتاحي)',
+                  data: metrics.groups.map(g => g.totalInWithInitial),
+                  backgroundColor: '#10b981',
+                  borderRadius: 6
+                },
+                {
+                  label: 'إجمالي الصرف (مع التحويل الصادر)',
+                  data: metrics.groups.map(g => g.withdrawals + g.transferOut),
+                  backgroundColor: '#f43f5e',
+                  borderRadius: 6
+                },
+                {
+                  label: 'الرصيد الصافي المتبقي',
+                  data: metrics.groups.map(g => g.currentBalance),
+                  backgroundColor: '#0d9488',
+                  borderRadius: 6
+                }
+              ]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: {
+                legend: { position: 'top', rtl: true }
+              },
+              scales: {
+                x: { grid: { display: false } },
+                y: { grid: { color: gridColor }, beginAtZero: true }
+              }
+            }
+          });
+        }
+
+        // 2. Doughnut Chart: Liquidity Shares
+        const doughCtx = document.getElementById('liquidityDoughnutChart');
+        if (doughCtx) {
+          if (doughnutChartInstance) doughnutChartInstance.destroy();
+          const posGroups = metrics.groups.map(g => Math.max(0, g.currentBalance));
+          const hasPositive = posGroups.some(v => v > 0);
+
+          doughnutChartInstance = new Chart(doughCtx, {
+            type: 'doughnut',
+            data: {
+              labels: hasPositive ? metrics.groups.map(g => g.name) : ['لا توجد سيولة موجبة بعد'],
+              datasets: [{
+                data: hasPositive ? posGroups : [1],
+                backgroundColor: hasPositive ? ['#0d9488', '#2563eb', '#7c3aed', '#d97706'] : ['#94a3b8'],
+                borderWidth: 2,
+                borderColor: isDark ? '#0f172a' : '#ffffff'
+              }]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              cutout: '64%',
+              plugins: {
+                legend: { position: 'bottom', rtl: true }
+              }
+            }
+          });
+        }
+
+        // 3. Expenses by Category Chart
+        const catCtx = document.getElementById('expensesCategoryChart');
+        if (catCtx) {
+          if (categoryChartInstance) categoryChartInstance.destroy();
+          const selectedGid = document.getElementById('categoryChartGroupFilter').value || 'all';
+          const catTotals = {};
+
+          state.transactions.forEach(tx => {
+            if (tx.type !== 'out') return;
+            if (selectedGid !== 'all' && tx.groupId !== selectedGid) return;
+            const cat = tx.category || 'أخرى';
+            catTotals[cat] = (catTotals[cat] || 0) + (Number(tx.amount) || 0);
+          });
+
+          const labels = Object.keys(catTotals);
+          const values = labels.map(k => catTotals[k]);
+
+          categoryChartInstance = new Chart(catCtx, {
+            type: 'bar',
+            data: {
+              labels: labels.length ? labels : ['لا توجد مصروفات مسجلة لهذا الفلتر'],
+              datasets: [{
+                label: 'إجمالي المصروفات حسب التصنيف',
+                data: values.length ? values : [0],
+                backgroundColor: ['#f43f5e', '#fb7185', '#e11d48', '#f97316', '#eab308', '#8b5cf6', '#06b6d4'],
+                borderRadius: 8
+              }]
+            },
+            options: {
+              indexAxis: 'y',
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: {
+                legend: { display: false }
+              },
+              scales: {
+                x: { grid: { color: gridColor }, beginAtZero: true },
+                y: { grid: { display: false } }
+              }
+            }
+          });
+        }
+      }
+
+      // 4. Render Smart Ledger View
+      function renderLedgerView() {
+        const cur = state.meta.currency || 'ج.س';
+
+        // Populate Group Filter & Category Filter options while preserving selection
+        const fGroup = document.getElementById('filterGroup');
+        const prevGroup = fGroup.value || 'all';
+        fGroup.innerHTML = `<option value="all">الكل (جميع الأطراف)</option>` +
+          state.groups.map(g => `<option value="${g.id}">${escapeHtml(g.name)}</option>`).join('');
+        fGroup.value = prevGroup;
+
+        const fCat = document.getElementById('filterCategory');
+        const prevCat = fCat.value || 'all';
+        const allCats = Array.from(new Set([...state.categories.out, ...state.categories.in, 'تحويل داخلي']));
+        fCat.innerHTML = `<option value="all">كل التصنيفات</option>` +
+          allCats.map(c => `<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`).join('');
+        fCat.value = prevCat;
+
+        const filtered = getFilteredTransactions();
+
+        // Compute totals for filtered transactions
+        let sumIn = 0;
+        let sumOut = 0;
+        filtered.forEach(tx => {
+          const amt = Number(tx.amount) || 0;
+          if (tx.type === 'in') sumIn += amt;
+          else if (tx.type === 'out') sumOut += amt;
+          else if (tx.type === 'transfer' && prevGroup !== 'all') {
+            if (tx.toGroupId === prevGroup) sumIn += amt;
+            if (tx.fromGroupId === prevGroup) sumOut += amt;
+          }
+        });
+
+        document.getElementById('filteredCountBadge').textContent = filtered.length;
+        document.getElementById('filteredTotalIn').textContent = `${formatNumber(sumIn)} ${cur}`;
+        document.getElementById('filteredTotalOut').textContent = `${formatNumber(sumOut)} ${cur}`;
+        document.getElementById('filteredNetAmount').textContent = `${formatNumber(sumIn - sumOut)} ${cur}`;
+
+        const tbody = document.getElementById('ledgerTableBody');
+        if (filtered.length === 0) {
+          tbody.innerHTML = `
+            <tr>
+              <td colspan="8" class="py-10 text-center text-slate-400 text-xs">
+                لا توجد عمليات مطابقة لشروط الفلترة الحالية.
+              </td>
+            </tr>
+          `;
+          return;
+        }
+
+        tbody.innerHTML = filtered.map(tx => {
+          let typeBadge = '';
+          let groupCell = '';
+          let amtClass = '';
+          let sign = '';
+
+          if (tx.type === 'in') {
+            typeBadge = '<span class="px-2 py-0.5 rounded-md text-[11px] font-bold bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300">وارد / إيداع</span>';
+            groupCell = escapeHtml(getGroupById(tx.groupId).name);
+            amtClass = 'text-emerald-600 dark:text-emerald-400';
+            sign = '+';
+          } else if (tx.type === 'out') {
+            typeBadge = '<span class="px-2 py-0.5 rounded-md text-[11px] font-bold bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300">صرف / سحب</span>';
+            groupCell = escapeHtml(getGroupById(tx.groupId).name);
+            amtClass = 'text-rose-600 dark:text-rose-400';
+            sign = '-';
+          } else {
+            typeBadge = '<span class="px-2 py-0.5 rounded-md text-[11px] font-bold bg-indigo-100 text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300">تحويل داخلي</span>';
+            groupCell = `${escapeHtml(getGroupById(tx.fromGroupId).name)} <i class="fa-solid fa-arrow-left mx-1 text-[10px] text-slate-400"></i> ${escapeHtml(getGroupById(tx.toGroupId).name)}`;
+            amtClass = 'text-indigo-600 dark:text-indigo-400';
+          }
+
+          return `
+            <tr class="hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition">
+              <td class="py-3 px-4 text-xs text-slate-500 dark:text-slate-400 whitespace-nowrap">${escapeHtml(formatShortDate(tx.date))}</td>
+              <td class="py-3 px-4 whitespace-nowrap">${typeBadge}</td>
+              <td class="py-3 px-4 font-bold text-slate-800 dark:text-slate-100 whitespace-nowrap">${groupCell}</td>
+              <td class="py-3 px-4 text-xs font-semibold text-slate-600 dark:text-slate-300 whitespace-nowrap">${escapeHtml(tx.category || 'تحويل داخلي')}</td>
+              <td class="py-3 px-4 font-extrabold ${amtClass} num-ltr whitespace-nowrap">${sign}${formatNumber(tx.amount)} ${escapeHtml(cur)}</td>
+              <td class="py-3 px-4 text-xs font-mono text-slate-500 dark:text-slate-400 whitespace-nowrap">${escapeHtml(tx.refNo || '—')}</td>
+              <td class="py-3 px-4 text-xs text-slate-700 dark:text-slate-300 max-w-xs truncate" title="${escapeHtml(tx.comment || '')}">${escapeHtml(tx.comment || '—')}</td>
+              <td class="py-3 px-4 text-center whitespace-nowrap">
+                <div class="inline-flex items-center gap-1.5">
+                  <button type="button" data-edit-tx="${tx.id}" title="تعديل العملية" class="w-7 h-7 rounded-lg bg-slate-100 hover:bg-teal-100 dark:bg-slate-800 dark:hover:bg-teal-950 text-slate-600 hover:text-teal-700 dark:text-slate-300 flex items-center justify-center transition">
+                    <i class="fa-solid fa-pen text-xs"></i>
+                  </button>
+                  <button type="button" data-delete-tx="${tx.id}" title="حذف العملية" class="w-7 h-7 rounded-lg bg-slate-100 hover:bg-rose-100 dark:bg-slate-800 dark:hover:bg-rose-950 text-slate-600 hover:text-rose-600 dark:text-slate-300 flex items-center justify-center transition">
+                    <i class="fa-solid fa-trash text-xs"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          `;
+        }).join('');
+      }
+
+      function getFilteredTransactions() {
+        const gFilter = document.getElementById('filterGroup').value || 'all';
+        const tFilter = document.getElementById('filterType').value || 'all';
+        const cFilter = document.getElementById('filterCategory').value || 'all';
+        const dFrom = document.getElementById('filterDateFrom').value;
+        const dTo = document.getElementById('filterDateTo').value;
+        const q = (document.getElementById('filterSearch').value || '').trim().toLowerCase();
+
+        return [...state.transactions]
+          .filter(tx => {
+            if (gFilter !== 'all') {
+              if (tx.type === 'transfer') {
+                if (tx.fromGroupId !== gFilter && tx.toGroupId !== gFilter) return false;
+              } else if (tx.groupId !== gFilter) {
+                return false;
+              }
+            }
+            if (tFilter !== 'all' && tx.type !== tFilter) return false;
+            if (cFilter !== 'all') {
+              const catName = tx.type === 'transfer' ? 'تحويل داخلي' : tx.category;
+              if (catName !== cFilter) return false;
+            }
+            if (dFrom) {
+              const txDay = String(tx.date).slice(0, 10);
+              if (txDay < dFrom) return false;
+            }
+            if (dTo) {
+              const txDay = String(tx.date).slice(0, 10);
+              if (txDay > dTo) return false;
+            }
+            if (q) {
+              const hay = `${tx.comment || ''} ${tx.refNo || ''} ${tx.category || ''}`.toLowerCase();
+              if (!hay.includes(q)) return false;
+            }
+            return true;
+          })
+          .sort((a, b) => new Date(b.date) - new Date(a.date));
+      }
+
+      // 5. Render Settings & Data Management View
+      function renderSettingsView() {
+        document.getElementById('settingAccountName').value = state.meta.accountName || '';
+        document.getElementById('settingCurrency').value = state.meta.currency || 'ج.س';
+
+        const grid = document.getElementById('settingsGroupsGrid');
+        grid.innerHTML = state.groups.map((g, idx) => `
+          <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-extrabold px-2.5 py-1 rounded-lg ${GROUP_PALETTE[g.id].badge}">الطرف #${idx + 1} (المعرف الثابت: ${g.id})</span>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-1">اسم الشخص / المجموعة</label>
+              <input type="text" data-group-field="name" data-gid="${g.id}" value="${escapeHtml(g.name)}"
+                class="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-2 text-sm font-bold">
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-1">الرصيد الافتتاحي</label>
+                <input type="text" inputmode="decimal" data-group-field="initialBalance" data-gid="${g.id}" value="${g.initialBalance}"
+                  class="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-2 text-sm font-bold num-ltr text-left">
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-1">حد التنبيه الأدنى</label>
+                <input type="text" inputmode="decimal" data-group-field="minAlert" data-gid="${g.id}" value="${g.minAlert}"
+                  class="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-2 text-sm font-bold num-ltr text-left">
+              </div>
+            </div>
+          </div>
+        `).join('');
+
+        // Render Categories Management Chips
+        const outList = document.getElementById('outCategoriesManageList');
+        outList.innerHTML = state.categories.out.map(c => `
+          <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-xs font-bold text-slate-700 dark:text-slate-200">
+            <span>${escapeHtml(c)}</span>
+            <button type="button" data-remove-out-cat="${escapeHtml(c)}" class="text-slate-400 hover:text-rose-600"><i class="fa-solid fa-xmark"></i></button>
+          </span>
+        `).join('');
+
+        const inList = document.getElementById('inCategoriesManageList');
+        inList.innerHTML = state.categories.in.map(c => `
+          <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-xs font-bold text-slate-700 dark:text-slate-200">
+            <span>${escapeHtml(c)}</span>
+            <button type="button" data-remove-in-cat="${escapeHtml(c)}" class="text-slate-400 hover:text-rose-600"><i class="fa-solid fa-xmark"></i></button>
+          </span>
+        `).join('');
+      }
+
+      // ---------------- WHATSAPP REPORT BUILDER & CUSTOMIZER ----------------
+      let currentWhatsAppScope = 'all'; // 'all' | 'g1' | 'g2' | 'g3' | 'g4' | 'custom'
+      let customSelectedGroupIds = ['g1', 'g2'];
+
+      function renderWhatsAppScopeControls() {
+        const selectEl = document.getElementById('whatsAppScopeSelect');
+        const btnsWrap = document.getElementById('whatsAppScopeButtons');
+        const customGroupsWrap = document.getElementById('waCustomGroupsWrap');
+        if (!selectEl || !btnsWrap) return;
+
+        selectEl.innerHTML = `<option value="all">الكل (الأطراف الأربعة)</option>` +
+          state.groups.map(g => `<option value="${g.id}">${escapeHtml(g.name)}</option>`).join('') +
+          `<option value="custom">تحديد أطراف مخصصة</option>`;
+        selectEl.value = currentWhatsAppScope;
+
+        const items = [
+          { id: 'all', label: 'الكل (4 أطراف)' },
+          ...state.groups.map(g => ({ id: g.id, label: g.name })),
+          { id: 'custom', label: 'تحديد متعدد ☑️' }
+        ];
+
+        btnsWrap.innerHTML = items.map(item => {
+          const active = item.id === currentWhatsAppScope;
+          const cls = active
+            ? 'px-2.5 py-2 rounded-xl text-xs font-bold bg-emerald-600 text-white shadow-xs transition truncate text-center'
+            : 'px-2.5 py-2 rounded-xl text-xs font-bold bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition truncate text-center';
+          return `<button type="button" data-wa-scope-btn="${item.id}" class="${cls}" title="${escapeHtml(item.label)}">${escapeHtml(item.label)}</button>`;
+        }).join('');
+
+        if (customGroupsWrap) {
+          customGroupsWrap.classList.toggle('hidden', currentWhatsAppScope !== 'custom');
+          customGroupsWrap.innerHTML = `<span class="text-xs font-bold text-slate-500">اختر الأطراف:</span>` +
+            state.groups.map(g => {
+              const checked = customSelectedGroupIds.includes(g.id) ? 'checked' : '';
+              return `
+                <label class="inline-flex items-center gap-1.5 text-xs font-bold text-slate-700 dark:text-slate-200 cursor-pointer bg-white dark:bg-slate-900 px-2.5 py-1 rounded-lg border border-slate-200 dark:border-slate-700">
+                  <input type="checkbox" data-wa-custom-gid="${g.id}" ${checked} class="rounded text-emerald-600 focus:ring-emerald-500">
+                  <span>${escapeHtml(g.name)}</span>
+                </label>
+              `;
+            }).join('');
+        }
+      }
+
+      function getWhatsAppReportOptions() {
+        const period = document.getElementById('waPeriodPreset')?.value || 'all';
+        const txType = document.getElementById('waTxTypeFilter')?.value || 'all';
+        const txLimit = Number(document.getElementById('waTxLimitSelect')?.value ?? 5);
+        const dateFrom = document.getElementById('waDateFrom')?.value || '';
+        const dateTo = document.getElementById('waDateTo')?.value || '';
+        const showTotalBank = document.getElementById('waOptTotalBank')?.checked ?? true;
+        const showRecon = document.getElementById('waOptReconStatus')?.checked ?? true;
+        const showDetailedTotals = document.getElementById('waOptDetailedTotals')?.checked ?? true;
+        const showCategoryBreakdown = document.getElementById('waOptCategoryBreakdown')?.checked ?? false;
+        const showSharePercent = document.getElementById('waOptSharePercent')?.checked ?? true;
+        const showRefNumbers = document.getElementById('waOptRefNumbers')?.checked ?? true;
+        const customTitle = (document.getElementById('waCustomTitle')?.value || '').trim();
+        const customFooter = (document.getElementById('waCustomFooter')?.value || '').trim();
+
+        return {
+          scope: currentWhatsAppScope,
+          customGroupIds: [...customSelectedGroupIds],
+          period,
+          txType,
+          txLimit,
+          dateFrom,
+          dateTo,
+          showTotalBank,
+          showRecon,
+          showDetailedTotals,
+          showCategoryBreakdown,
+          showSharePercent,
+          showRefNumbers,
+          customTitle,
+          customFooter
+        };
+      }
+
+      function filterTransactionsForWhatsApp(opts, targetGroupIds) {
+        const now = new Date();
+        const todayStr = now.toISOString().slice(0, 10);
+        const weekAgo = new Date(now.getTime() - 7 * 86400000).toISOString().slice(0, 10);
+        const monthPrefix = todayStr.slice(0, 7); // YYYY-MM
+
+        // If user chose 'ledger_filter', reuse the Smart Ledger filtered list as base
+        let baseList = opts.period === 'ledger_filter' ? getFilteredTransactions() : [...state.transactions];
+
+        return baseList
+          .filter(tx => {
+            // 1. Scope / Target Groups filter
+            if (opts.scope !== 'all') {
+              if (tx.type === 'transfer') {
+                if (!targetGroupIds.includes(tx.fromGroupId) && !targetGroupIds.includes(tx.toGroupId)) return false;
+              } else {
+                if (!targetGroupIds.includes(tx.groupId)) return false;
+              }
+            }
+
+            // 2. Transaction Type filter
+            if (opts.txType !== 'all' && tx.type !== opts.txType) return false;
+
+            // 3. Period filter
+            const txDay = String(tx.date || '').slice(0, 10);
+            if (opts.period === 'today' && txDay !== todayStr) return false;
+            if (opts.period === 'week' && txDay < weekAgo) return false;
+            if (opts.period === 'month' && !txDay.startsWith(monthPrefix)) return false;
+            if (opts.period === 'custom_dates') {
+              if (opts.dateFrom && txDay < opts.dateFrom) return false;
+              if (opts.dateTo && txDay > opts.dateTo) return false;
+            }
+
+            return true;
+          })
+          .sort((a, b) => new Date(b.date) - new Date(a.date));
+      }
+
+      function generateWhatsAppSummaryText(passedScope) {
+        if (typeof passedScope === 'string') {
+          currentWhatsAppScope = passedScope;
+        }
+        const opts = getWhatsAppReportOptions();
+        const metrics = computeMetrics();
+        const cur = state.meta.currency || 'ج.س';
+        const nowStr = new Date().toLocaleString('ar-EG', { dateStyle: 'medium', timeStyle: 'short' });
+
+        // Determine target groups
+        let targetGroupIds = state.groups.map(g => g.id);
+        if (opts.scope === 'custom') {
+          targetGroupIds = opts.customGroupIds.length ? opts.customGroupIds : [state.groups[0].id];
+        } else if (opts.scope !== 'all' && metrics.byId[opts.scope]) {
+          targetGroupIds = [opts.scope];
+        }
+        const targetGroups = targetGroupIds.map(id => metrics.byId[id]).filter(Boolean);
+        const isSingleParty = targetGroups.length === 1 && opts.scope !== 'all';
+
+        const periodLabels = {
+          all: 'شامل جميع الفترات',
+          today: 'حركات اليوم فقط',
+          week: 'آخر 7 أيام',
+          month: 'هذا الشهر',
+          ledger_filter: 'حسب فلتر السجل الذكي',
+          custom_dates: `من ${opts.dateFrom || 'البداية'} إلى ${opts.dateTo || 'اليوم'}`
+        };
+
+        let lines = [];
+
+        // Header Title
+        if (opts.customTitle) {
+          lines.push(`📊 *${opts.customTitle}*`);
+        } else if (isSingleParty) {
+          lines.push(`👤 *كشف حساب طرف: ${targetGroups[0].name}*`);
+          lines.push(`🏦 الحساب: ${state.meta.accountName || 'الحساب البنكي المشترك'}`);
+        } else if (opts.scope === 'custom') {
+          lines.push(`📊 *تقرير مخصص (${targetGroups.map(g => g.name).join(' ، ')})*`);
+        } else {
+          lines.push(`📊 *تقرير ${state.meta.accountName || 'الحساب البنكي المشترك'}*`);
+        }
+
+        lines.push(`📅 التاريخ: ${nowStr}`);
+        if (opts.period !== 'all') {
+          lines.push(`🗓️ نطاق الحركات: ${periodLabels[opts.period] || ''}`);
+        }
+        lines.push(`━━━━━━━━━━━━━━━━━━`);
+
+        // Total Bank & Reconciliation (if enabled)
+        if (opts.showTotalBank) {
+          lines.push(`🏦 *إجمالي الرصيد الدفتري بالبنك:* ${formatNumber(metrics.totalBookBalance)} ${cur}`);
+        }
+        if (opts.showRecon) {
+          const actualNum = parseAmountInput(state.meta.actualBankBalance);
+          if (!isNaN(actualNum) && String(state.meta.actualBankBalance).trim() !== '') {
+            const diff = actualNum - metrics.totalBookBalance;
+            if (Math.abs(diff) < 0.005) {
+              lines.push(`✅ *المطابقة مع تطبيق البنك:* مطابق تماماً`);
+            } else {
+              const sign = diff > 0 ? '+' : '';
+              lines.push(`⚠️ *المطابقة مع تطبيق البنك:* فرق (${sign}${formatNumber(diff)} ${cur})`);
+            }
+          }
+        }
+        if (opts.showTotalBank || opts.showRecon) {
+          lines.push(`━━━━━━━━━━━━━━━━━━`);
+        }
+
+        // Single Party Detailed Breakdown vs Multi-Party Breakdown
+        if (isSingleParty) {
+          const g = targetGroups[0];
+          const statusText = g.status === 'overdraft'
+            ? '🚨 مكشوف بالسالب'
+            : (g.status === 'low' ? '⚠️ قارب على النفاد' : '🟢 آمن');
+
+          lines.push(`💰 *الرصيد الصافي لـ ${g.name}:* ${formatNumber(g.currentBalance)} ${cur}`);
+          if (opts.showSharePercent) {
+            lines.push(`📌 *الحالة والحصة:* ${statusText} (${g.sharePercent.toFixed(1)}% من سيولة البنك)`);
+          }
+
+          if (opts.showDetailedTotals) {
+            lines.push(`━━━━━━━━━━━━━━━━━━`);
+            lines.push(`📈 *تفصيل الحركة المالية لـ ${g.name}:*`);
+            lines.push(`• الرصيد الافتتاحي: ${formatNumber(g.initialBalance)} ${cur}`);
+            lines.push(`• إجمالي الإيداعات (الوارد): +${formatNumber(g.deposits)} ${cur}`);
+            lines.push(`• إجمالي المسحوبات (الصرف): -${formatNumber(g.withdrawals)} ${cur}`);
+            if (g.transferIn > 0 || g.transferOut > 0) {
+              const netSign = g.netTransfers > 0 ? '+' : '';
+              lines.push(`• تحويلات داخلية واردة: +${formatNumber(g.transferIn)} ${cur}`);
+              lines.push(`• تحويلات داخلية صادرة: -${formatNumber(g.transferOut)} ${cur}`);
+              lines.push(`• صافي التحويلات الداخلية: ${netSign}${formatNumber(g.netTransfers)} ${cur}`);
+            }
+          }
+        } else {
+          lines.push(`👥 *أرصدة الأطراف (${targetGroups.length}):*`);
+          targetGroups.forEach((g, idx) => {
+            const icon = g.status === 'overdraft' ? '🚨' : (g.status === 'low' ? '⚠️' : '🟢');
+            const sharePart = opts.showSharePercent ? ` ${icon} (${g.sharePercent.toFixed(1)}%)` : '';
+            lines.push(`${idx + 1}. *${g.name}:* ${formatNumber(g.currentBalance)} ${cur}${sharePart}`);
+            if (opts.showDetailedTotals) {
+              const netSign = g.netTransfers > 0 ? '+' : '';
+              lines.push(`   ↳ [افتتاحي: ${formatNumber(g.initialBalance)} | وارد: +${formatNumber(g.deposits)} | صرف: -${formatNumber(g.withdrawals)}${g.netTransfers !== 0 ? ` | تحويلات: ${netSign}${formatNumber(g.netTransfers)}` : ''}]`);
+            }
+          });
+        }
+
+        const matchedTxs = filterTransactionsForWhatsApp(opts, targetGroupIds);
+
+        // Optional Category Breakdown
+        if (opts.showCategoryBreakdown) {
+          const catMap = {};
+          matchedTxs.forEach(tx => {
+            if (tx.type !== 'out') return;
+            const c = tx.category || 'أخرى';
+            catMap[c] = (catMap[c] || 0) + (Number(tx.amount) || 0);
+          });
+          const catKeys = Object.keys(catMap).sort((a, b) => catMap[b] - catMap[a]);
+          if (catKeys.length > 0) {
+            lines.push(`━━━━━━━━━━━━━━━━━━`);
+            lines.push(`🏷️ *توزيع المصروفات حسب التصنيف:*`);
+            catKeys.forEach(c => {
+              lines.push(`• ${c}: ${formatNumber(catMap[c])} ${cur}`);
+            });
+          }
+        }
+
+        // Transactions List Section (if limit > 0)
+        if (opts.txLimit > 0) {
+          lines.push(`━━━━━━━━━━━━━━━━━━`);
+          const sliced = matchedTxs.slice(0, opts.txLimit);
+          const limitTitle = opts.txLimit >= 9999
+            ? `🕒 *سجل الحركات (${sliced.length} حركة):*`
+            : `🕒 *آخر الحركات المسجلة (${sliced.length} من ${matchedTxs.length}):*`;
+          lines.push(limitTitle);
+
+          if (sliced.length === 0) {
+            lines.push(`- لا توجد حركات مطابقة لشروط التقرير.`);
+          } else {
+            sliced.forEach(tx => {
+              const d = formatShortDate(tx.date);
+              const refStr = (opts.showRefNumbers && tx.refNo) ? ` (إشعار: ${tx.refNo})` : '';
+              const commentStr = tx.comment ? ` - ${tx.comment}` : '';
+
+              if (tx.type === 'in') {
+                const who = isSingleParty ? '' : `${getGroupById(tx.groupId).name} • `;
+                lines.push(`⬆️ [+${formatNumber(tx.amount)} ${cur}] ${who}${tx.category}${commentStr}${refStr} [${d}]`);
+              } else if (tx.type === 'out') {
+                const who = isSingleParty ? '' : `${getGroupById(tx.groupId).name} • `;
+                lines.push(`⬇️ [-${formatNumber(tx.amount)} ${cur}] ${who}${tx.category}${commentStr}${refStr} [${d}]`);
+              } else {
+                if (isSingleParty) {
+                  const singleId = targetGroups[0].id;
+                  if (tx.fromGroupId === singleId) {
+                    lines.push(`🔄 [-${formatNumber(tx.amount)} ${cur}] تحويل صادر إلى ${getGroupById(tx.toGroupId).name}${commentStr}${refStr} [${d}]`);
+                  } else {
+                    lines.push(`🔄 [+${formatNumber(tx.amount)} ${cur}] تحويل وارد من ${getGroupById(tx.fromGroupId).name}${commentStr}${refStr} [${d}]`);
+                  }
+                } else {
+                  lines.push(`🔄 [${formatNumber(tx.amount)} ${cur}] تحويل: ${getGroupById(tx.fromGroupId).name} ← ${getGroupById(tx.toGroupId).name}${commentStr}${refStr} [${d}]`);
+                }
+              }
+            });
+          }
+        }
+
+        // Optional Custom Closing Note
+        if (opts.customFooter) {
+          lines.push(`━━━━━━━━━━━━━━━━━━`);
+          lines.push(`📝 *ملاحظة:* ${opts.customFooter}`);
+        }
+
+        return lines.join('\n');
+      }
+
+      function refreshWhatsAppPreviewText() {
+        const ta = document.getElementById('whatsAppReportTextarea');
+        if (ta) {
+          ta.value = generateWhatsAppSummaryText();
+        }
+      }
+
+      function openWhatsAppModal(preferredScope) {
+        if (typeof preferredScope === 'string' && (preferredScope === 'all' || preferredScope === 'custom' || state.groups.some(g => g.id === preferredScope))) {
+          currentWhatsAppScope = preferredScope;
+        } else {
+          const ledgerGroupFilter = document.getElementById('filterGroup') ? document.getElementById('filterGroup').value : 'all';
+          if (currentView === 'ledger' && ledgerGroupFilter && ledgerGroupFilter !== 'all') {
+            currentWhatsAppScope = ledgerGroupFilter;
+          } else {
+            currentWhatsAppScope = 'all';
+          }
+        }
+
+        // Adjust default checkboxes smoothly when switching between single party and all
+        const detailedCheck = document.getElementById('waOptDetailedTotals');
+        if (detailedCheck) {
+          detailedCheck.checked = (currentWhatsAppScope !== 'all');
+        }
+
+        renderWhatsAppScopeControls();
+        refreshWhatsAppPreviewText();
+        document.getElementById('whatsAppModal').classList.remove('hidden');
+      }
+
+      function copyTextToClipboard(text) {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(() => {
+            showToast('تم نسخ ملخص الواتساب إلى الحافظة بنجاح ✅', 'success');
+          }).catch(() => fallbackCopy(text));
+        } else {
+          fallbackCopy(text);
+        }
+      }
+
+      function fallbackCopy(text) {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        try {
+          document.execCommand('copy');
+          showToast('تم نسخ ملخص الواتساب إلى الحافظة بنجاح ✅', 'success');
+        } catch (e) {
+          showToast('تعذر النسخ التلقائي، يمكنك تحديد النص ونسخه يدوياً', 'warning');
+        }
+        ta.remove();
+      }
+
+      // ---------------- EXCEL (.XLSX) & JSON EXPORT/IMPORT ----------------
+      function exportToExcel() {
+        if (typeof XLSX === 'undefined') {
+          showToast('مكتبة التصدير إلى Excel غير محملة حالياً', 'error');
+          return;
+        }
+        const metrics = computeMetrics();
+        const cur = state.meta.currency || 'ج.س';
+
+        // Sheet 1: Summary of the 4 Groups
+        const summaryRows = metrics.groups.map(g => ({
+          'المعرف (ID)': g.id,
+          'الطرف / المجموعة': g.name,
+          'الرصيد الافتتاحي': g.initialBalance,
+          'إجمالي الإيداعات (الوارد)': g.deposits,
+          'إجمالي المسحوبات (الصرف)': g.withdrawals,
+          'صافي التحويلات الداخلية': g.netTransfers,
+          'الرصيد الصافي الحالي': g.currentBalance,
+          'النسبة من السيولة (%)': Number(g.sharePercent.toFixed(2)),
+          'حالة الرصيد': g.status === 'overdraft' ? 'مكشوف بالسالب' : (g.status === 'low' ? 'قارب على النفاد' : 'آمن')
+        }));
+
+        summaryRows.push({
+          'المعرف (ID)': 'TOTAL',
+          'الطرف / المجموعة': 'الإجمالي الكلي للحساب البنكي',
+          'الرصيد الافتتاحي': metrics.totalInitial,
+          'إجمالي الإيداعات (الوارد)': metrics.totalDeposits,
+          'إجمالي المسحوبات (الصرف)': metrics.totalWithdrawals,
+          'صافي التحويلات الداخلية': 0,
+          'الرصيد الصافي الحالي': metrics.totalBookBalance,
+          'النسبة من السيولة (%)': 100,
+          'حالة الرصيد': `العملة: ${cur}`
+        });
+
+        // Sheet 2: Full Transactions Ledger
+        const sortedTxs = [...state.transactions].sort((a, b) => new Date(b.date) - new Date(a.date));
+        const ledgerRows = sortedTxs.map(tx => ({
+          'معرف العملية': tx.id,
+          'التاريخ والوقت': tx.date,
+          'نوع التسجيل': tx.type === 'in' ? 'وارد / إيداع' : (tx.type === 'out' ? 'صرف / سحب' : 'تحويل داخلي'),
+          'الطرف / صاحب العملية': tx.type === 'transfer'
+            ? `من ${getGroupById(tx.fromGroupId).name} إلى ${getGroupById(tx.toGroupId).name}`
+            : getGroupById(tx.groupId).name,
+          'التصنيف': tx.type === 'transfer' ? 'تحويل داخلي' : tx.category,
+          'المبلغ': Number(tx.amount) || 0,
+          'رقم الإشعار البنكي': tx.refNo || '',
+          'التعليق / البيان': tx.comment || ''
+        }));
+
+        const wb = XLSX.utils.book_new();
+        const wsSummary = XLSX.utils.json_to_sheet(summaryRows);
+        const wsLedger = XLSX.utils.json_to_sheet(ledgerRows.length ? ledgerRows : [{ 'ملاحظة': 'لا توجد عمليات مسجلة بعد' }]);
+
+        XLSX.utils.book_append_sheet(wb, wsSummary, 'ملخص الأطراف الأربعة');
+        XLSX.utils.book_append_sheet(wb, wsLedger, 'سجل العمليات الكامل');
+
+        const dateStamp = new Date().toISOString().slice(0, 10);
+        XLSX.writeFile(wb, `خزينة_الشركاء_${dateStamp}.xlsx`);
+        showToast('تم تصدير ملف الإكسل (.xlsx) بنجاح 📊', 'success');
+      }
+
+      function exportJsonBackup() {
+        const dataStr = JSON.stringify(state, null, 2);
+        const blob = new Blob([dataStr], { type: 'application/json;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        const dateStamp = new Date().toISOString().slice(0, 10);
+        a.href = url;
+        a.download = `shared_bank_backup_${dateStamp}.json`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+        showToast('تم تحميل النسخة الاحتياطية (.json) بنجاح 💾', 'success');
+      }
+
+      function downloadStandaloneHtml() {
+        const htmlContent = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+        const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'index.html';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+        showToast('تم تنزيل ملف index.html الجاهز للرفع على GitHub Pages', 'success');
+      }
+
+      // ---------------- SAMPLE DATA & RESET ----------------
+      function loadSampleData() {
+        const now = new Date();
+        const isoDaysAgo = (days, hour = 11) => {
+          const d = new Date(now.getTime() - days * 86400000);
+          d.setHours(hour, 30, 0, 0);
+          return toLocalDatetimeValue(d);
+        };
+
+        state.meta.accountName = 'حساب بنكك المشترك - الشركاء الأربعة';
+        state.meta.currency = 'ج.س';
+        state.groups = [
+          { id: 'g1', name: 'مجموعة محمد', initialBalance: 1200000, minAlert: 200000 },
+          { id: 'g2', name: 'مجموعة أحمد', initialBalance: 950000, minAlert: 150000 },
+          { id: 'g3', name: 'مجموعة خالد', initialBalance: 600000, minAlert: 150000 },
+          { id: 'g4', name: 'صندوق الطوارئ', initialBalance: 450000, minAlert: 100000 }
+        ];
+
+        state.transactions = [
+          { id: 'tx_1', type: 'in', groupId: 'g1', category: 'إيداع/تغذية', amount: 500000, refNo: 'BNK-774102', comment: 'تغذية حساب شهرية من عميل', date: isoDaysAgo(6, 10) },
+          { id: 'tx_2', type: 'out', groupId: 'g2', category: 'مشتريات', amount: 320000, refNo: 'BNK-774589', comment: 'شراء مستلزمات ومعدات تشغيل', date: isoDaysAgo(5, 14) },
+          { id: 'tx_3', type: 'out', groupId: 'g3', category: 'فواتير وخدمات', amount: 185000, refNo: 'BNK-775011', comment: 'سداد فواتير الإنترنت والكهرباء', date: isoDaysAgo(4, 16) },
+          { id: 'tx_4', type: 'in', groupId: 'g2', category: 'تحويل بنكي وارد', amount: 400000, refNo: 'BNK-776201', comment: 'دفعة مبيعات محولة لحساب أحمد', date: isoDaysAgo(3, 12) },
+          { id: 'tx_5', type: 'transfer', fromGroupId: 'g1', toGroupId: 'g3', category: 'تحويل داخلي', amount: 150000, refNo: 'INT-001', comment: 'تسوية حساب مشترك بين محمد وخالد', date: isoDaysAgo(2, 18) },
+          { id: 'tx_6', type: 'out', groupId: 'g4', category: 'صيانة', amount: 95000, refNo: 'BNK-778920', comment: 'صيانة دورية للمولد الاحتياطي', date: isoDaysAgo(1, 9) },
+          { id: 'tx_7', type: 'out', groupId: 'g1', category: 'تحويل بنكي صادر', amount: 275000, refNo: 'BNK-779310', comment: 'تحويل لمورد البضاعة', date: isoDaysAgo(0, 11) }
+        ];
+
+        // Compute total book balance to set matching actualBankBalance as demonstration
+        const m = computeMetrics();
+        state.meta.actualBankBalance = String(m.totalBookBalance);
+
+        saveState();
+        refreshAllUI();
+        showToast('تم تحميل البيانات التجريبية بنجاح! يمكنك استكشاف الرسوم والتقارير الآن ✨', 'success');
+      }
+
+      // ---------------- DATE HELPERS ----------------
+      function toLocalDatetimeValue(dateObj) {
+        const d = dateObj || new Date();
+        const pad = n => String(n).padStart(2, '0');
+        return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+      }
+
+      function formatShortDate(dateStr) {
+        if (!dateStr) return '—';
+        const d = new Date(dateStr);
+        if (isNaN(d.getTime())) return String(dateStr);
+        return d.toLocaleString('ar-EG', {
+          month: 'short',
+          day: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit'
+        });
+      }
+
+      // ---------------- CONFIRMATION MODAL ----------------
+      function openConfirmModal({ title, message, doubleCheck = false, onConfirm }) {
+        document.getElementById('confirmModalTitle').textContent = title;
+        document.getElementById('confirmModalMessage').textContent = message;
+        const doubleWrap = document.getElementById('confirmDoubleCheckWrap');
+        const checkbox = document.getElementById('confirmDoubleCheckbox');
+        checkbox.checked = false;
+        requireDoubleConfirm = doubleCheck;
+        doubleWrap.classList.toggle('hidden', !doubleCheck);
+        pendingConfirmAction = onConfirm;
+        document.getElementById('confirmModal').classList.remove('hidden');
+      }
+
+      function closeConfirmModal() {
+        document.getElementById('confirmModal').classList.add('hidden');
+        pendingConfirmAction = null;
+      }
+
+      // ---------------- EVENT LISTENERS & INITIALIZATION ----------------
+      function initEvents() {
+        // Set default entry date to now
+        document.getElementById('entryDate').value = toLocalDatetimeValue(new Date());
+
+        // Navigation clicks (Sidebar, Bottom bar, In-page links)
+        document.addEventListener('click', (e) => {
+          const navBtn = e.target.closest('[data-nav]');
+          if (navBtn) {
+            switchView(navBtn.getAttribute('data-nav'));
+            return;
+          }
+
+          // Select Transaction Type
+          const txTypeBtn = e.target.closest('[data-tx-type]');
+          if (txTypeBtn) {
+            entryFormState.type = txTypeBtn.getAttribute('data-tx-type');
+            renderQuickEntryView(computeMetrics());
+            return;
+          }
+
+          // Select Group Card in Quick Entry
+          const groupCard = e.target.closest('[data-select-group]');
+          if (groupCard) {
+            entryFormState.groupId = groupCard.getAttribute('data-select-group');
+            renderQuickEntryView(computeMetrics());
+            return;
+          }
+
+          // Select Category Chip in Quick Entry
+          const catChip = e.target.closest('[data-select-cat]');
+          if (catChip) {
+            entryFormState.category = catChip.getAttribute('data-select-cat');
+            renderQuickEntryView(computeMetrics());
+            return;
+          }
+
+          // Switch WhatsApp Modal Scope (All vs Specific Group vs Custom Multi-Select)
+          const waScopeBtn = e.target.closest('[data-wa-scope-btn]');
+          if (waScopeBtn) {
+            currentWhatsAppScope = waScopeBtn.getAttribute('data-wa-scope-btn') || 'all';
+            const detailedCheck = document.getElementById('waOptDetailedTotals');
+            if (detailedCheck && currentWhatsAppScope !== 'all' && currentWhatsAppScope !== 'custom') {
+              detailedCheck.checked = true;
+            }
+            renderWhatsAppScopeControls();
+            refreshWhatsAppPreviewText();
+            return;
+          }
+
+          // Toggle Custom Multi-Select Group Checkbox inside WhatsApp Modal
+          const customGidCheck = e.target.closest('[data-wa-custom-gid]');
+          if (customGidCheck) {
+            const gid = customGidCheck.getAttribute('data-wa-custom-gid');
+            if (customGidCheck.checked) {
+              if (!customSelectedGroupIds.includes(gid)) customSelectedGroupIds.push(gid);
+            } else {
+              if (customSelectedGroupIds.length <= 1) {
+                customGidCheck.checked = true;
+                showToast('يجب اختيار طرف واحد على الأقل في التحديد المخصص', 'warning');
+                return;
+              }
+              customSelectedGroupIds = customSelectedGroupIds.filter(id => id !== gid);
+            }
+            refreshWhatsAppPreviewText();
+            return;
+          }
+
+          // Open WhatsApp Modal directly for a specific group from Dashboard table
+          const waGroupBtn = e.target.closest('[data-wa-group]');
+          if (waGroupBtn) {
+            const gid = waGroupBtn.getAttribute('data-wa-group');
+            openWhatsAppModal(gid);
+            return;
+          }
+
+          // Edit Transaction in Ledger
+          const editBtn = e.target.closest('[data-edit-tx]');
+          if (editBtn) {
+            const txId = editBtn.getAttribute('data-edit-tx');
+            startEditingTransaction(txId);
+            return;
+          }
+
+          // Delete Transaction in Ledger
+          const delBtn = e.target.closest('[data-delete-tx]');
+          if (delBtn) {
+            const txId = delBtn.getAttribute('data-delete-tx');
+            const tx = state.transactions.find(t => t.id === txId);
+            if (!tx) return;
+            openConfirmModal({
+              title: 'تأكيد حذف العملية',
+              message: `هل أنت متأكد من حذف هذه العملية بمبلغ (${formatNumber(tx.amount)} ${state.meta.currency})؟ سيتم إعادة احتساب الأرصدة فوراً.`,
+              doubleCheck: false,
+              onConfirm: () => {
+                state.transactions = state.transactions.filter(t => t.id !== txId);
+                saveState();
+                refreshAllUI();
+                showToast('تم حذف العملية وتحديث الأرصدة', 'info');
+              }
+            });
+            return;
+          }
+
+          // Remove Out Category
+          const remOut = e.target.closest('[data-remove-out-cat]');
+          if (remOut) {
+            const c = remOut.getAttribute('data-remove-out-cat');
+            if (state.categories.out.length <= 1) {
+              showToast('يجب الإبقاء على تصنيف واحد على الأقل', 'warning');
+              return;
+            }
+            state.categories.out = state.categories.out.filter(item => item !== c);
+            saveState();
+            refreshAllUI();
+            return;
+          }
+
+          // Remove In Category
+          const remIn = e.target.closest('[data-remove-in-cat]');
+          if (remIn) {
+            const c = remIn.getAttribute('data-remove-in-cat');
+            if (state.categories.in.length <= 1) {
+              showToast('يجب الإبقاء على تصنيف واحد على الأقل', 'warning');
+              return;
+            }
+            state.categories.in = state.categories.in.filter(item => item !== c);
+            saveState();
+            refreshAllUI();
+            return;
+          }
+        });
+
+        // Transfer Dropdown changes
+        document.getElementById('transferFromGroup').addEventListener('change', (e) => {
+          entryFormState.fromGroupId = e.target.value;
+          updateLiveEntryPreview(computeMetrics());
+        });
+        document.getElementById('transferToGroup').addEventListener('change', (e) => {
+          entryFormState.toGroupId = e.target.value;
+          updateLiveEntryPreview(computeMetrics());
+        });
+
+        // Live Amount input listener
+        document.getElementById('entryAmount').addEventListener('input', () => {
+          updateLiveEntryPreview(computeMetrics());
+        });
+
+        // Cancel Edit Button
+        document.getElementById('cancelEditBtn').addEventListener('click', resetEntryForm);
+
+        // Jump to Categories settings
+        document.getElementById('jumpToCategoriesBtn').addEventListener('click', () => {
+          switchView('settings');
+        });
+
+        // Submit Quick Entry Form
+        document.getElementById('quickEntryForm').addEventListener('submit', (e) => {
+          e.preventDefault();
+          handleQuickEntrySubmit();
+        });
+
+        // Bank Reconciliation Inputs (Quick & Dashboard synced)
+        const handleActualBankInput = (val) => {
+          state.meta.actualBankBalance = val;
+          saveState();
+          const m = computeMetrics();
+          renderTopStripAndSidebar(m);
+          renderQuickReconciliationBox(m);
+          if (currentView === 'dashboard') {
+            renderDashboardView(m);
+          }
+        };
+
+        document.getElementById('quickActualBankInput').addEventListener('input', (e) => {
+          handleActualBankInput(e.target.value);
+        });
+        document.getElementById('dashboardActualBankInput').addEventListener('input', (e) => {
+          handleActualBankInput(e.target.value);
+        });
+        document.getElementById('clearActualBankBtn').addEventListener('click', () => {
+          document.getElementById('dashboardActualBankInput').value = '';
+          document.getElementById('quickActualBankInput').value = '';
+          handleActualBankInput('');
+        });
+
+        // Category Chart Filter Change
+        document.getElementById('categoryChartGroupFilter').addEventListener('change', () => {
+          renderCharts();
+        });
+
+        // Smart Ledger Filters
+        ['filterGroup', 'filterType', 'filterCategory', 'filterDateFrom', 'filterDateTo', 'filterSearch'].forEach(id => {
+          const el = document.getElementById(id);
+          if (el) {
+            el.addEventListener('input', () => renderLedgerView());
+            el.addEventListener('change', () => renderLedgerView());
+          }
+        });
+
+        document.getElementById('resetFiltersBtn').addEventListener('click', () => {
+          document.getElementById('filterGroup').value = 'all';
+          document.getElementById('filterType').value = 'all';
+          document.getElementById('filterCategory').value = 'all';
+          document.getElementById('filterDateFrom').value = '';
+          document.getElementById('filterDateTo').value = '';
+          document.getElementById('filterSearch').value = '';
+          renderLedgerView();
+        });
+
+        // WhatsApp Summary & Customizer Listeners
+        document.getElementById('openWhatsAppModalBtn').addEventListener('click', () => openWhatsAppModal());
+        document.getElementById('dashboardQuickWhatsAppBtn').addEventListener('click', () => openWhatsAppModal('all'));
+        document.getElementById('quickWhatsAppHeaderBtn').addEventListener('click', () => openWhatsAppModal());
+        document.getElementById('whatsAppScopeSelect').addEventListener('change', (e) => {
+          currentWhatsAppScope = e.target.value || 'all';
+          renderWhatsAppScopeControls();
+          refreshWhatsAppPreviewText();
+        });
+        document.getElementById('waPeriodPreset').addEventListener('change', (e) => {
+          const isCustomDates = e.target.value === 'custom_dates';
+          document.getElementById('waCustomDatesWrap').classList.toggle('hidden', !isCustomDates);
+          refreshWhatsAppPreviewText();
+        });
+        ['waTxTypeFilter', 'waTxLimitSelect', 'waDateFrom', 'waDateTo', 'waCustomTitle', 'waCustomFooter'].forEach(id => {
+          const el = document.getElementById(id);
+          if (el) {
+            el.addEventListener('change', refreshWhatsAppPreviewText);
+            el.addEventListener('input', refreshWhatsAppPreviewText);
+          }
+        });
+        document.querySelectorAll('.wa-opt-check').forEach(chk => {
+          chk.addEventListener('change', refreshWhatsAppPreviewText);
+        });
+        document.getElementById('waRegenerateBtn').addEventListener('click', () => {
+          refreshWhatsAppPreviewText();
+          showToast('تمت إعادة توليد نص التقرير وفق الخيارات المحددة', 'info');
+        });
+        document.getElementById('directSendWhatsAppBtn').addEventListener('click', () => {
+          const text = document.getElementById('whatsAppReportTextarea').value;
+          const url = 'https://wa.me/?text=' + encodeURIComponent(text);
+          window.open(url, '_blank', 'noopener,noreferrer');
+        });
+        document.getElementById('closeWhatsAppModalBtn').addEventListener('click', () => {
+          document.getElementById('whatsAppModal').classList.add('hidden');
+        });
+        document.getElementById('copyWhatsAppTextBtn').addEventListener('click', () => {
+          const text = document.getElementById('whatsAppReportTextarea').value;
+          copyTextToClipboard(text);
+        });
+
+        // Settings Form Save
+        document.getElementById('groupsSettingsForm').addEventListener('submit', (e) => {
+          e.preventDefault();
+          state.meta.accountName = document.getElementById('settingAccountName').value.trim() || 'الحساب البنكي المشترك';
+          state.meta.currency = document.getElementById('settingCurrency').value.trim() || 'ج.س';
+
+          state.groups.forEach(g => {
+            const nameInput = document.querySelector(`[data-group-field="name"][data-gid="${g.id}"]`);
+            const initInput = document.querySelector(`[data-group-field="initialBalance"][data-gid="${g.id}"]`);
+            const minInput = document.querySelector(`[data-group-field="minAlert"][data-gid="${g.id}"]`);
+            if (nameInput && nameInput.value.trim()) g.name = nameInput.value.trim();
+            if (initInput) {
+              const parsedInit = parseAmountInput(initInput.value);
+              g.initialBalance = isNaN(parsedInit) ? 0 : parsedInit;
+            }
+            if (minInput) {
+              const parsedMin = parseAmountInput(minInput.value);
+              g.minAlert = isNaN(parsedMin) ? 0 : parsedMin;
+            }
+          });
+
+          saveState();
+          refreshAllUI();
+          showToast('تم حفظ أسماء الأطراف والأرصدة الافتتاحية بنجاح ✅', 'success');
+        });
+
+        // Add Categories
+        document.getElementById('addOutCategoryBtn').addEventListener('click', () => {
+          const inp = document.getElementById('newOutCategoryInput');
+          const val = inp.value.trim();
+          if (!val) return;
+          if (!state.categories.out.includes(val)) {
+            state.categories.out.push(val);
+            saveState();
+            refreshAllUI();
+            showToast(`تمت إضافة تصنيف الصرف: ${val}`, 'success');
+          }
+          inp.value = '';
+        });
+
+        document.getElementById('addInCategoryBtn').addEventListener('click', () => {
+          const inp = document.getElementById('newInCategoryInput');
+          const val = inp.value.trim();
+          if (!val) return;
+          if (!state.categories.in.includes(val)) {
+            state.categories.in.push(val);
+            saveState();
+            refreshAllUI();
+            showToast(`تمت إضافة تصنيف الوارد: ${val}`, 'success');
+          }
+          inp.value = '';
+        });
+
+        // Data Center Buttons
+        document.getElementById('exportExcelBtn').addEventListener('click', exportToExcel);
+        document.getElementById('ledgerExportExcelBtn').addEventListener('click', exportToExcel);
+        document.getElementById('exportJsonBtn').addEventListener('click', exportJsonBackup);
+        document.getElementById('downloadStandaloneHtmlBtn').addEventListener('click', downloadStandaloneHtml);
+        document.getElementById('quickDownloadAppBtn').addEventListener('click', downloadStandaloneHtml);
+
+        // Import JSON Backup
+        document.getElementById('importJsonInput').addEventListener('change', (e) => {
+          const file = e.target.files && e.target.files[0];
+          if (!file) return;
+          const reader = new FileReader();
+          reader.onload = (ev) => {
+            try {
+              const imported = JSON.parse(ev.target.result);
+              if (!imported || !Array.isArray(imported.groups) || !Array.isArray(imported.transactions)) {
+                showToast('ملف النسخة الاحتياطية غير صالح!', 'error');
+                return;
+              }
+              localStorage.setItem(STORAGE_KEY, JSON.stringify(imported));
+              state = loadState();
+              applyTheme();
+              refreshAllUI();
+              showToast('تم استيراد النسخة الاحتياطية وتحديث كافة البيانات بنجاح ✅', 'success');
+            } catch (err) {
+              showToast('خطأ أثناء قراءة ملف JSON', 'error');
+            }
+          };
+          reader.readAsText(file);
+          e.target.value = '';
+        });
+
+        // Load Sample Data Buttons
+        const triggerSampleLoad = () => {
+          if (state.transactions.length > 0) {
+            openConfirmModal({
+              title: 'تحميل بيانات تجريبية',
+              message: 'سيؤدي تحميل البيانات التجريبية إلى استبدال الحركات الحالية ببيانات افتراضية للتجربة. هل ترغب بالمتابعة؟',
+              doubleCheck: false,
+              onConfirm: loadSampleData
+            });
+          } else {
+            loadSampleData();
+          }
+        };
+        document.getElementById('loadSampleDataBtn').addEventListener('click', triggerSampleLoad);
+        document.getElementById('stripSampleDataBtn').addEventListener('click', triggerSampleLoad);
+
+        // Reset All Data (with Double Confirmation)
+        document.getElementById('resetAllDataBtn').addEventListener('click', () => {
+          openConfirmModal({
+            title: 'مسح جميع البيانات (ضبط المصنع)',
+            message: 'تحذير: سيتم حذف جميع العمليات المسجلة وتصفير الأرصدة الافتتاحية. لا يمكن التراجع عن هذه الخطوة إلا إذا كان لديك نسخة احتياطية.',
+            doubleCheck: true,
+            onConfirm: () => {
+              state = getDefaultState();
+              saveState();
+              resetEntryForm();
+              refreshAllUI();
+              showToast('تم مسح جميع البيانات وإعادة النظام لحالته الافتراضية', 'info');
+            }
+          });
+        });
+
+        // Confirm Modal Buttons
+        document.getElementById('confirmCancelBtn').addEventListener('click', closeConfirmModal);
+        document.getElementById('confirmProceedBtn').addEventListener('click', () => {
+          if (requireDoubleConfirm && !document.getElementById('confirmDoubleCheckbox').checked) {
+            showToast('يرجى تحديد مربع التأكيد النهائي للمتابعة', 'warning');
+            return;
+          }
+          if (typeof pendingConfirmAction === 'function') {
+            pendingConfirmAction();
+          }
+          closeConfirmModal();
+        });
+
+        // Theme Toggle Buttons
+        document.getElementById('themeToggleDesktop').addEventListener('click', toggleTheme);
+        document.getElementById('themeToggleMobile').addEventListener('click', toggleTheme);
+      }
+
+      // ---------------- FORM SUBMIT & EDIT HANDLERS ----------------
+      function handleQuickEntrySubmit() {
+        const rawAmt = document.getElementById('entryAmount').value;
+        const amount = parseAmountInput(rawAmt);
+        if (isNaN(amount) || amount <= 0) {
+          showToast('يرجى إدخال مبلغ صحيح أكبر من الصفر', 'error');
+          document.getElementById('entryAmount').focus();
+          return;
+        }
+
+        if (entryFormState.type === 'transfer' && entryFormState.fromGroupId === entryFormState.toGroupId) {
+          showToast('لا يمكن التحويل الداخلي لنفس الطرف! اختر طرفين مختلفين', 'error');
+          return;
+        }
+
+        const dateVal = document.getElementById('entryDate').value || toLocalDatetimeValue(new Date());
+        const refNo = document.getElementById('entryRefNo').value.trim();
+        const comment = document.getElementById('entryComment').value.trim();
+        const editingId = document.getElementById('editingTxId').value;
+
+        const txRecord = {
+          id: editingId || ('tx_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6)),
+          type: entryFormState.type,
+          groupId: entryFormState.type === 'transfer' ? '' : entryFormState.groupId,
+          fromGroupId: entryFormState.type === 'transfer' ? entryFormState.fromGroupId : '',
+          toGroupId: entryFormState.type === 'transfer' ? entryFormState.toGroupId : '',
+          category: entryFormState.type === 'transfer' ? 'تحويل داخلي' : entryFormState.category,
+          amount: Number(amount.toFixed(2)),
+          refNo,
+          comment,
+          date: dateVal
+        };
+
+        if (editingId) {
+          const idx = state.transactions.findIndex(t => t.id === editingId);
+          if (idx !== -1) state.transactions[idx] = txRecord;
+          showToast('تم حفظ التعديلات وتحديث الأرصدة بنجاح ✅', 'success');
+        } else {
+          state.transactions.push(txRecord);
+          // Check if overdraft occurred to notify clearly
+          const metricsAfter = computeMetrics();
+          const targetGid = txRecord.type === 'transfer' ? txRecord.fromGroupId : txRecord.groupId;
+          const groupAfter = metricsAfter.byId[targetGid];
+          if (txRecord.type !== 'in' && groupAfter && groupAfter.currentBalance < 0) {
+            showToast(`تم الحفظ ⚠️ تنبيه: رصيد "${groupAfter.name}" أصبح مكشوفاً بالسالب!`, 'warning');
+          } else {
+            showToast('تم تسجيل العملية وتحديث أرصدة الأطراف فوراً ✅', 'success');
+          }
+        }
+
+        saveState();
+        resetEntryForm();
+        refreshAllUI();
+      }
+
+      function startEditingTransaction(txId) {
+        const tx = state.transactions.find(t => t.id === txId);
+        if (!tx) return;
+
+        switchView('entry');
+        document.getElementById('editingTxId').value = tx.id;
+        entryFormState.type = tx.type;
+        if (tx.type === 'transfer') {
+          entryFormState.fromGroupId = tx.fromGroupId || 'g1';
+          entryFormState.toGroupId = tx.toGroupId || 'g2';
+        } else {
+          entryFormState.groupId = tx.groupId || 'g1';
+          entryFormState.category = tx.category || '';
+        }
+
+        document.getElementById('entryAmount').value = tx.amount;
+        document.getElementById('entryDate').value = tx.date ? tx.date.slice(0, 16) : toLocalDatetimeValue(new Date());
+        document.getElementById('entryRefNo').value = tx.refNo || '';
+        document.getElementById('entryComment').value = tx.comment || '';
+
+        document.getElementById('entryFormTitle').textContent = 'تعديل العملية المسجلة';
+        document.getElementById('entrySubmitBtnText').textContent = 'حفظ التعديلات على العملية';
+        document.getElementById('cancelEditBtn').classList.remove('hidden');
+
+        renderQuickEntryView(computeMetrics());
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+
+      function resetEntryForm() {
+        document.getElementById('editingTxId').value = '';
+        document.getElementById('entryAmount').value = '';
+        document.getElementById('entryRefNo').value = '';
+        document.getElementById('entryComment').value = '';
+        document.getElementById('entryDate').value = toLocalDatetimeValue(new Date());
+        document.getElementById('entryFormTitle').textContent = 'تسجيل عملية سريعة';
+        document.getElementById('entrySubmitBtnText').textContent = 'حفظ العملية وتحديث الأرصدة';
+        document.getElementById('cancelEditBtn').classList.add('hidden');
+        updateLiveEntryPreview(computeMetrics());
+      }
+
+      // Boot application
+      applyTheme();
+      initEvents();
+      switchView('entry');
+    })();
+  </script>
+</body>
+</html>
